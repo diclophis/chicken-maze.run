@@ -166,8 +166,8 @@ class MazeGame
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 60.0
-    @maze_draw_distance = 4
+    @fovy = 19.0
+    @maze_draw_distance = 1
 
     @cool_down = [99, 99]
 
@@ -499,12 +499,20 @@ class MazeGame
     #@camera_target[0] += (delta_time * 0.33 * (nx - @camera_target[0] + @player_velocity[0]))
     #@camera_target[2] += (delta_time * 0.33 * (ny - @camera_target[2] + @player_velocity[2] - 0.1))
 
-    @camera_position[0] -= 0.125 * delta_time * ((@camera_position[0] - px) - ((px) - @cpx)) - (0.5 * delta_time * @player_velocity[0])
-    @camera_position[1] = 2.25
-    @camera_position[2] -= 0.125 * delta_time * ((@camera_position[2] - py + 1.5)- ((py) - @cpy)) - (0.5 * delta_time * @player_velocity[2])
+    #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
+    ##@camera_position[0] = -1 + px
+    @camera_position[1] = 2.0
+    ##@camera_position[2] = -1 + py
+    #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
 
-    @camera_target[0] = @camera_position[0]
-    @camera_target[2] = @camera_position[2] + 1.5
+    ##@camera_target[0] = @camera_position[0]
+    ##@camera_target[2] = @camera_position[2] + 1.5
+
+    @camera_target[0] = px
+    @camera_target[2] = py
+
+    @camera_position[0] = px - 1.33
+    @camera_position[2] = py - 1.77
 
     if px != @cpx
       @cpx = px
@@ -541,7 +549,7 @@ end
 
 Wkndr.nonce {
   Wkndr.client_side { |gl|
-    gl.open_default_view! 60
+    gl.open_default_view!
 
     @start_game_proc = Proc.new {
       @maze_level ||= 0
