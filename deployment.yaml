@@ -56,7 +56,7 @@ metadata:
     ingress.class: wkndr
 spec:
   rules:
-  - host: maze.bardin.haus
+  - host: chicken-maze.run
     http:
       paths:
       - backend:

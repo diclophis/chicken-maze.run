@@ -550,6 +550,7 @@ end
 Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
+    #gl.open_default_view! 0
 
     @start_game_proc = Proc.new {
       @maze_level ||= 0
