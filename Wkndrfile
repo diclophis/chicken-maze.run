@@ -1,5 +1,7 @@
 #
 
+PRIMARY  = 0x000000FF
+
 class MazeGame
   def test_aabb(min_a, max_a, min_b, max_b)
     d1x = -min_b[0] - -max_a[0]
@@ -86,9 +88,9 @@ class MazeGame
       end
     }
 
-    chicken_file = "resources/ayam4.obj"
+    chicken_file = "resources/duck.glb" #"resources/ayam4.obj"
     #@cube = Sphere.new(0.5, 50, 50, 0.1) #Model.new(chicken_file, "", 0.1)
-    @cube = Model.new(chicken_file, "", 0.1)
+    @cube = Model.new(chicken_file, "", 0.001)
     @at_exit_time = 0.0
 
     @enforce_bounds = true
@@ -105,16 +107,30 @@ class MazeGame
     #log!(:exit, @exit)
 
     ## generate a orthogonal maze
-    @maze = Theseus::OrthogonalMaze.generate({
-      :wrap => "xy",
-      :width => @maze_s,
-      :height => @maze_s,
-      :braid => braid,
-      :weave => weave,
-      :sparse => sparse,
-      :randomness => randomness,
-      :exit => @exit
-    })
+    #@maze = Theseus::OrthogonalMaze.generate({
+    #  :wrap => "xy",
+    #  :width => @maze_s,
+    #  :height => @maze_s,
+    #  :braid => braid,
+    #  :weave => weave,
+    #  :sparse => sparse,
+    #  :randomness => randomness,
+    #  :exit => @exit
+    #})
+    @maze = []
+    @maze_s.times { |w|
+      @maze[w] ||= []
+      @maze_s.times { |h|
+        @maze[w][h] = nil
+      }
+    }
+
+    @maze[0][0] = 15
+    #@maze[1][1] = 2
+
+    #raise @maze.inspect
+
+    @maze_exit = [1][1]
 
     #enter_at = [0, 0]
     #exit_at = [0,1]
@@ -166,8 +182,8 @@ class MazeGame
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 19.0
-    @maze_draw_distance = 1
+    @fovy = 30.0
+    @maze_draw_distance = 10
 
     @cool_down = [99, 99]
 
@@ -306,8 +322,8 @@ class MazeGame
     py = ((ny - 0).round)
 
     if px >= 0 && px < @maze_s && py >= 0 && py < @maze_s
-      player_at_shape_cell = @maze[px.to_i, py.to_i]
-      player_at_shape = @shape_translate_table[(player_at_shape_cell & Theseus::Maze::PRIMARY)]
+      player_at_shape_cell = @maze[px.to_i][py.to_i] #@maze[px.to_i, py.to_i]
+      player_at_shape = @shape_translate_table[(player_at_shape_cell & PRIMARY)]
     end
 
     case player_at_shape
@@ -394,7 +410,7 @@ class MazeGame
       correction = ab[1]
     end
 
-    if @maze.exit == [px, py]
+    if @maze_exit == [px, py]
       @at_exit_time += delta_time
 
       if @at_exit_time > 0.0
@@ -404,9 +420,12 @@ class MazeGame
       @at_exit_time = 0.0
     end
 
+    skip_camera_update = false
+
     if !player_at_shape 
-      @player_velocity[0] = 0
-      @player_velocity[2] = 0
+      @player_velocity[0] = -@player_velocity[0]
+      @player_velocity[2] = -@player_velocity[2]
+      skip_camera_update = true
     else
       if bounced
         line = nil
@@ -490,46 +509,48 @@ class MazeGame
 #      #@player_velocity[2] = @player_velocity[2] + (-friction_y * (@player_velocity[2]) * delta_time)
 #    end
 
-    #@camera_position[0] += (delta_time * 1.0 * (nx - @camera_position[0] - @player_velocity[0]))
-    #@camera_position[2] += (delta_time * 1.0 * (ny - (@camera_position[2] - @player_velocity[2] + 0.1)))
+    unless skip_camera_update
+      #@camera_position[0] += (delta_time * 1.0 * (nx - @camera_position[0] - @player_velocity[0]))
+      #@camera_position[2] += (delta_time * 1.0 * (ny - (@camera_position[2] - @player_velocity[2] + 0.1)))
 
-    ##@camera_position[1] += ((1.0 + @player_velocity[0].abs) * (1.0 + @player_velocity[2].abs)) * delta_time
-    ##@camera_position[1] = 5
+      ##@camera_position[1] += ((1.0 + @player_velocity[0].abs) * (1.0 + @player_velocity[2].abs)) * delta_time
+      ##@camera_position[1] = 5
 
-    #@camera_target[0] += (delta_time * 0.33 * (nx - @camera_target[0] + @player_velocity[0]))
-    #@camera_target[2] += (delta_time * 0.33 * (ny - @camera_target[2] + @player_velocity[2] - 0.1))
+      #@camera_target[0] += (delta_time * 0.33 * (nx - @camera_target[0] + @player_velocity[0]))
+      #@camera_target[2] += (delta_time * 0.33 * (ny - @camera_target[2] + @player_velocity[2] - 0.1))
 
-    #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
-    ##@camera_position[0] = -1 + px
-    @camera_position[1] = 2.0
-    ##@camera_position[2] = -1 + py
-    #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
+      #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
+      ##@camera_position[0] = -1 + px
+      @camera_position[1] = 2.0
+      ##@camera_position[2] = -1 + py
+      #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
 
-    ##@camera_target[0] = @camera_position[0]
-    ##@camera_target[2] = @camera_position[2] + 1.5
+      ##@camera_target[0] = @camera_position[0]
+      ##@camera_target[2] = @camera_position[2] + 1.5
 
-    @camera_target[0] = px
-    @camera_target[2] = py
+      @camera_target[0] = px
+      @camera_target[2] = py
 
-    @camera_position[0] = px - 1.33
-    @camera_position[2] = py - 1.77
+      @camera_position[0] = px - 1.33
+      @camera_position[2] = py - 1.77
 
-    if px != @cpx
-      @cpx = px
+      if px != @cpx
+        @cpx = px
+      end
+
+      if py != @cpy
+        @cpy = py
+      end
+
+      gl.lookat(1, *@camera_position, *@camera_target, @fovy)
     end
-
-    if py != @cpy
-      @cpy = py
-    end
-
-    gl.lookat(1, *@camera_position, *@camera_target, @fovy)
 
     ((px-@maze_draw_distance)..(px+@maze_draw_distance)).each do |x|
       ((py-@maze_draw_distance)..(py+@maze_draw_distance)).each do |y|
         if x>=0 && x<@maze_s && y>=0 && y<@maze_s
-          cell = @maze[x, y]
+          cell = @maze[x][y]
           unless cell == 0
-            primary = (cell & Theseus::Maze::PRIMARY)
+            primary = (cell & PRIMARY)
             if shape = @shapes[primary]
               shape.deltap(x, 0, y)
               shape.draw(false)
@@ -562,7 +583,7 @@ Wkndr.nonce {
   }
 }
 
-Wkndr.server_side { |server|
+Wkndr.server_side { |gl, server|
   server.wsb("/") do |cn, phr|
   end
 }

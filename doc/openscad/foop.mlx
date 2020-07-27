@@ -1,5 +1,6 @@
 <!DOCTYPE FilterScript>
 <FilterScript>
+ <!--
  <filter name="Re-Orient all faces coherentely"/>
  <filter name="Normalize Face Normals"/>
  <filter name="Normalize Vertex Normals"/>
@@ -9,6 +10,7 @@
  <filter name="Invert Faces Orientation">
   <Param type="RichBool" value="true" name="forceFlip"/>
  </filter>
+ -->
  <filter name="Transform: Rotate">
   <Param enum_val0="X axis" enum_val1="Y axis" enum_cardinality="4" enum_val2="Z axis" enum_val3="custom axis" type="RichEnum" value="0" name="rotAxis"/>
   <Param enum_val0="origin" enum_val1="barycenter" enum_cardinality="3" enum_val2="custom point" type="RichEnum" value="0" name="rotCenter"/>
@@ -18,19 +20,47 @@
   <Param x="0" y="0" z="0" type="RichPoint3f" name="customCenter"/>
   <Param type="RichFloat" value="30" name="snapAngle"/>
   <Param type="RichBool" value="true" name="Freeze"/>
-  <Param type="RichBool" value="false" name="ToAll"/>
+  <Param type="RichBool" value="false" name="allLayers"/>
  </filter>
+
+<!--
+ <filter name="Transform: Rotate">
+  <Param description="Rotation on:" enum_cardinality="4" enum_val3="custom axis" enum_val1="Y axis" isxmlparam="0" name="rotAxis" type="RichEnum" enum_val0="X axis" tooltip="Choose a method" value="0" enum_val2="Z axis"/>
+  <Param description="Center of rotation:" enum_cardinality="3" enum_val1="barycenter" isxmlparam="0" name="rotCenter" type="RichEnum" enum_val0="origin" tooltip="Choose a method" value="0" enum_val2="custom point"/>
+  <Param description="Rotation Angle" isxmlparam="0" name="angle" type="RichDynamicFloat" max="360" tooltip="Angle of rotation (in &lt;b>degree&lt;/b>). If snapping is enabled this value is rounded according to the snap value" value="90" min="-360"/>
+  <Param description="Custom axis" x="0" z="0" isxmlparam="0" y="0" name="customAxis" type="RichPoint3f" tooltip="This rotation axis is used only if the 'custom axis' option is chosen."/>
+  <Param description="Custom center" x="0" z="0" isxmlparam="0" y="0" name="customCenter" type="RichPoint3f" tooltip="This rotation center is used only if the 'custom point' option is chosen."/>
+  <Param description="Snap angle" isxmlparam="0" name="snapFlag" type="RichBool" tooltip="If selected, before starting the filter will remove any unreferenced vertex (for which curvature values are not defined)" value="false"/>
+  <Param description="Snapping Value" isxmlparam="0" name="snapAngle" type="RichFloat" tooltip="This value is used to snap the rotation angle (i.e. if the snapping value is 30, 227 becomes 210)." value="30"/>
+  <Param description="Freeze Matrix" isxmlparam="0" name="Freeze" type="RichBool" tooltip="The transformation is explicitly applied, and the vertex coordinates are actually changed" value="true"/>
+  <Param description="Apply to all visible Layers" isxmlparam="0" name="allLayers" type="RichBool" tooltip="If selected the filter will be applied to all visible mesh layers" value="false"/>
+ </filter>
+-->
+
  <filter name="Subdivision Surfaces: Midpoint">
   <Param type="RichInt" value="1" name="Iterations"/>
   <Param type="RichAbsPerc" value="1e-06" min="0" name="Threshold" max="1.42352"/>
   <Param type="RichBool" value="false" name="Selected"/>
  </filter>
+ <!--
  <filter name="Parametrization: Trivial Per-Triangle ">
   <Param type="RichInt" value="0" name="sidedim"/>
   <Param type="RichInt" value="1024" name="textdim"/>
   <Param type="RichInt" value="2" name="border"/>
   <Param enum_val0="Basic" enum_val1="Space-optimizing" enum_cardinality="2" type="RichEnum" value="1" name="method"/>
  </filter>
+ -->
+
+ <!--
+ <filter name="Parametrization: Trivial Per-Triangle">
+  <Param description="Quads per line" type="RichInt" tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation" isxmlparam="0" value="0" name="sidedim"/>
+  <Param description="Texture Dimension (px)" type="RichInt" tooltip="Gives an indication on how big the texture is" isxmlparam="0" value="1024" name="textdim"/>
+  <Param description="Inter-Triangle border (px)" type="RichInt" tooltip="Specifies how many pixels to be left between triangles in parametrization domain" isxmlparam="0" value="2" name="border"/>
+  <Param enum_cardinality="2" description="Method" type="RichEnum" enum_val0="Basic" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain" isxmlparam="0" value="1" name="method" enum_val1="Space-optimizing"/>
+ </filter>
+ -->
+
+ <!--
  <filter name="Vertex Color to Texture">
   <Param type="RichString" value="shape-null_tex.png" name="textName"/>
   <Param type="RichInt" value="1024" name="textW"/>
@@ -38,5 +68,31 @@
   <Param type="RichBool" value="false" name="overwrite"/>
   <Param type="RichBool" value="true" name="assign"/>
   <Param type="RichBool" value="true" name="pullpush"/>
+ </filter>
+ -->
+
+
+ <filter name="Ambient Occlusion">
+  <Param name="occMode" tooltip="Occlusion may be calculated per-vertex or per-face, color and quality will be saved in the chosen component." enum_val0="per-Vertex" isxmlparam="0" value="0" enum_val1="per-Face (deprecated)" type="RichEnum" enum_cardinality="2" description="Occlusion mode:"/>
+  <Param name="dirBias" tooltip="The balance between a uniform and a directionally biased set of lighting direction&lt;br>: - 0 means light came only uniformly from any direction&lt;br> - 1 means that all the light cames from the specified cone of directions &lt;br> - other values mix the two set of lighting directions " isxmlparam="0" value="0.5" type="RichFloat" description="Directional Bias [0..1]"/>
+  <Param name="reqViews" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time" isxmlparam="0" value="256" type="RichInt" description="Requested views"/>
+  <Param name="coneDir" tooltip="Number of different views placed around the mesh. More views means better accuracy at the cost of increased calculation time" x="-0.469" isxmlparam="0" z="0.701" type="RichPoint3f" description="Lighting Direction" y="0.5372"/>
+  <Param name="coneAngle" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time" isxmlparam="0" value="30" type="RichFloat" description="Cone amplitude"/>
+  <Param name="useGPU" tooltip="Only works for per-vertex AO. In order to use GPU-Mode, your hardware must support FBOs, FP32 Textures and Shaders. Normally increases the performance by a factor of 4x-5x" isxmlparam="0" value="false" type="RichBool" description="Use GPU acceleration"/>
+  <Param name="depthTexSize" tooltip="Defines the depth texture size used to compute occlusion from each point of view. Higher values means better accuracy usually with low impact on performance" isxmlparam="0" value="512" type="RichInt" description="Depth texture size(should be 2^n)"/>
+ </filter>
+ <filter name="Parametrization: Trivial Per-Triangle">
+  <Param name="sidedim" tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation" isxmlparam="0" value="0" type="RichInt" description="Quads per line"/>
+  <Param name="textdim" tooltip="Gives an indication on how big the texture is" isxmlparam="0" value="1024" type="RichInt" description="Texture Dimension (px)"/>
+  <Param name="border" tooltip="Specifies how many pixels to be left between triangles in parametrization domain" isxmlparam="0" value="2" type="RichInt" description="Inter-Triangle border (px)"/>
+  <Param name="method" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain" enum_val0="Basic" isxmlparam="0" value="1" enum_val1="Space-optimizing" type="RichEnum" enum_cardinality="2" description="Method"/>
+ </filter>
+ <filter name="Transfer: Vertex Color to Texture">
+  <Param name="textName" tooltip="The texture file to be created" isxmlparam="0" value="shape-null_tex.png" type="RichString" description="Texture file"/>
+  <Param name="textW" tooltip="The texture width" isxmlparam="0" value="1024" type="RichInt" description="Texture width (px)"/>
+  <Param name="textH" tooltip="The texture height" isxmlparam="0" value="1024" type="RichInt" description="Texture height (px)"/>
+  <Param name="overwrite" tooltip="if current mesh has a texture will be overwritten (with provided texture dimension)" isxmlparam="0" value="false" type="RichBool" description="Overwrite texture"/>
+  <Param name="assign" tooltip="assign the newly created texture" isxmlparam="0" value="false" type="RichBool" description="Assign texture"/>
+  <Param name="pullpush" tooltip="if enabled the unmapped texture space is colored using a pull push filling algorithm, if false is set to black" isxmlparam="0" value="true" type="RichBool" description="Fill texture"/>
  </filter>
 </FilterScript>
