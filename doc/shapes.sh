@@ -48,7 +48,7 @@ do
   FOO="-m vc"
   MESHARGS="-l /var/tmp/mllog -i ./resources/shape-${I}.stl -o ./resources/shape-${I}-mid.obj $FOO -s doc/openscad/$FILTERS"
 
-  FOO2="-m vc vn wt"
+  FOO2="-m vc vn vt wt"
   MESHARGS_TWO="-l /var/tmp/mllog -i ./resources/shape-${I}-mid.obj -o ./resources/shape-${I}.obj $FOO2 -s doc/openscad/foop.mlx"
 
   $MESHLAB ${MESHARGS}
@@ -60,4 +60,6 @@ do
   sed -i -e "s~mtllib\ \./~mtllib\ $THIS_WORKING_DIR/resources/~" resources/shape-${I}.obj
   sed -i -e "s~map_Kd\ ~map_Kd\ $THIS_WORKING_DIR/resources/~" resources/shape-${I}.obj.mtl
   sed -i -e "s~shape-null~shape-$I~" resources/shape-${I}.obj.mtl
+
+  assimp export resources/shape-${I}.obj resources/shape-${I}.glb -fglb2 -embtex --flip-uv
 done

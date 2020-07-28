@@ -83,7 +83,7 @@ class MazeGame
 
       if ii
         @shape_translate_table[i] = ii
-        shape_file = "resources/shape-#{ii}.obj"
+        shape_file = "resources/shape-#{ii}.glb"
         @shapes[i] = Model.new(shape_file, "", 1.0)
       end
     }
