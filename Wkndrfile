@@ -186,12 +186,21 @@ class MazeGame
     @lin_y2 = 0.0
 
     @fovy = 120.0
-    @maze_draw_distance = 1
+    @maze_draw_distance = 2
 
     @cool_down = [99, 99]
 
     @time_since_last_hop = 99
     @time_since_last_input = [99, 99]
+
+    dice_roll_draw_buffer
+  end
+
+  def dice_roll_draw_buffer
+    @draw_buffer = []
+    (((@maze_draw_distance + 1) * 2) * ((@maze_draw_distance + 1) * 2)).times {
+      @draw_buffer << (rand * 15.0).to_i
+    }
   end
 
   def update_and_draw_threed(gl, global_time, delta_time)
@@ -524,7 +533,7 @@ class MazeGame
 
       #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
       #@camera_position[0] = -1 + px
-      @camera_position[1] = 0.345
+      @camera_position[1] = 0.5
       #@camera_position[2] = -1 + py
       #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
 
@@ -540,7 +549,7 @@ class MazeGame
       @camera_target[0] = @player_position[0]
       @camera_target[2] = @player_position[2]
 
-      @camera_position[0] = @camera_target[0] - 0.123
+      @camera_position[0] = @camera_target[0] - 0.0
       @camera_position[2] = @camera_target[2] - 0.234
 
       if px != @cpx
@@ -554,12 +563,24 @@ class MazeGame
       gl.lookat(1, *@camera_position, *@camera_target, @fovy)
     end
 
+    dbi = 0
+
     ((px-@maze_draw_distance)..(px+@maze_draw_distance)).each do |x|
       ((py-@maze_draw_distance)..(py+@maze_draw_distance)).each do |y|
         if x>=0 && x<@maze_s && y>=0 && y<@maze_s
           cell = @maze[x][y]
           unless cell == 0
-            primary = (cell & PRIMARY)
+            #[x, y] != [px, py] && [x, y] != [px-1, py]
+            #[x, y] != [px, py] && [x, y] != [px-1, py]
+            if ((x > (px)) && (y > (py))) ||
+            ((x < (px)) && (y < (py)))
+              primary = @draw_buffer[dbi]
+              #primary = (cell & PRIMARY)
+              dbi += 1
+            else
+              primary = (cell & PRIMARY)
+            end
+
             if shape = @shapes[primary]
               shape.deltap(x, 0, y)
               shape.draw(false)

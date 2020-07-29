@@ -52,6 +52,10 @@
  <filter name="Merge Wedge Texture Coord">
   <Param name="MergeThr" isxmlparam="0" value="0.0001" description="Merging Threshold" type="RichFloat" tooltip="All the per-wedge texture coords that are on the same vertex and are distant less then the given threshold are merged together. It can be used to remove the fake texture seams that arise from error. Distance is in texture space (the default, 1e-4, corresponds to one texel on a 10kx10x texture) "/>
  </filter>
+ <filter name="Simplification: Clustering Decimation">
+  <Param min="0" name="Threshold" value="0.0001" max="1.0" tooltip="The size of the cell of the clustering grid. Smaller the cell finer the resulting mesh. For obtaining a very coarse mesh use larger values." isxmlparam="0" description="Cell Size" type="RichAbsPerc"/>
+  <Param name="Selected" value="false" tooltip="If selected the filter affect only the selected faces" isxmlparam="0" description="Affect only selected faces" type="RichBool"/>
+ </filter>
  <filter name="Ambient Occlusion">
   <Param name="occMode" isxmlparam="0" enum_val1="per-Face (deprecated)" enum_cardinality="2" enum_val0="per-Vertex" value="0" description="Occlusion mode:" type="RichEnum" tooltip="Occlusion may be calculated per-vertex or per-face, color and quality will be saved in the chosen component."/>
   <Param name="dirBias" isxmlparam="0" value="0.9" description="Directional Bias [0..1]" type="RichFloat" tooltip="The balance between a uniform and a directionally biased set of lighting direction&lt;br>: - 0 means light came only uniformly from any direction&lt;br> - 1 means that all the light cames from the specified cone of directions &lt;br> - other values mix the two set of lighting directions "/>
