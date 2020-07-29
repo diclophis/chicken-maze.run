@@ -40,14 +40,16 @@
  <filter name="Merge Wedge Texture Coord">
   <Param name="MergeThr" isxmlparam="0" value="0.0001" description="Merging Threshold" type="RichFloat" tooltip="All the per-wedge texture coords that are on the same vertex and are distant less then the given threshold are merged together. It can be used to remove the fake texture seams that arise from error. Distance is in texture space (the default, 1e-4, corresponds to one texel on a 10kx10x texture) "/>
  </filter>
+
  <!--
  <filter name="Simplification: Clustering Decimation">
   <Param min="0" name="Threshold" value="0.002" max="100.0" tooltip="The size of the cell of the clustering grid. Smaller the cell finer the resulting mesh. For obtaining a very coarse mesh use larger values." isxmlparam="0" description="Cell Size" type="RichAbsPerc"/>
   <Param name="Selected" value="false" tooltip="If selected the filter affect only the selected faces" isxmlparam="0" description="Affect only selected faces" type="RichBool"/>
  </filter>
  -->
+ <!--
  <filter name="Simplification: Quadric Edge Collapse Decimation">
-  <Param isxmlparam="0" description="Target number of faces" type="RichInt" value="64" tooltip="The desired final number of faces." name="TargetFaceNum"/>
+  <Param isxmlparam="0" description="Target number of faces" type="RichInt" value="80" tooltip="The desired final number of faces." name="TargetFaceNum"/>
   <Param isxmlparam="0" description="Percentage reduction (0..1)" type="RichFloat" value="0" tooltip="If non zero, this parameter specifies the desired final size of the mesh as a percentage of the initial size." name="TargetPerc"/>
   <Param isxmlparam="0" description="Quality threshold" type="RichFloat" value="0.001" tooltip="Quality threshold for penalizing bad shaped faces.&lt;br>The value is in the range [0..1]&#xa; 0 accept any kind of face (no penalties),&#xa; 0.5  penalize faces with quality &lt; 0.5, proportionally to their shape&#xa;" name="QualityThr"/>
   <Param isxmlparam="0" description="Preserve Boundary of the mesh" type="RichBool" value="true" tooltip="The simplification process tries to do not affect mesh boundaries during simplification" name="PreserveBoundary"/>
@@ -61,6 +63,7 @@
   <Param isxmlparam="0" description="Post-simplification cleaning" type="RichBool" value="true" tooltip="After the simplification an additional set of steps is performed to clean the mesh (unreferenced vertices, bad faces, etc)" name="AutoClean"/>
   <Param isxmlparam="0" description="Simplify only selected faces" type="RichBool" value="false" tooltip="The simplification is applied only to the selected set of faces.&#xa; Take care of the target number of faces!" name="Selected"/>
  </filter>
+ -->
  <!--
  <filter name="Ambient Occlusion">
   <Param name="occMode" isxmlparam="0" enum_val1="per-Face (deprecated)" enum_cardinality="2" enum_val0="per-Vertex" value="0" description="Occlusion mode:" type="RichEnum" tooltip="Occlusion may be calculated per-vertex or per-face, color and quality will be saved in the chosen component."/>
@@ -72,11 +75,17 @@
   <Param name="depthTexSize" isxmlparam="0" value="128" description="Depth texture size(should be 2^n)" type="RichInt" tooltip="Defines the depth texture size used to compute occlusion from each point of view. Higher values means better accuracy usually with low impact on performance"/>
  </filter>
  -->
+ <filter name="Taubin Smooth">
+  <Param description="Lambda" name="lambda" type="RichFloat" isxmlparam="0" value="3" tooltip="The lambda parameter of the Taubin Smoothing algorithm"/>
+  <Param description="mu" name="mu" type="RichFloat" isxmlparam="0" value="3" tooltip="The mu parameter of the Taubin Smoothing algorithm"/>
+  <Param description="Smoothing steps" name="stepSmoothNum" type="RichInt" isxmlparam="0" value="1" tooltip="The number of times that the taubin smoothing is iterated. Usually it requires a larger number of iteration than the classical laplacian"/>
+  <Param description="Affect only selected faces" name="Selected" type="RichBool" isxmlparam="0" value="false" tooltip="If checked the filter is performed only on the selected faces"/>
+ </filter>
  <filter name="Volumetric obscurance">
   <Param type="RichEnum" enum_cardinality="2" name="onPrimitive" tooltip="Choose whether to trace rays from faces or from vertices. " description="Metric:" value="0" isxmlparam="0" enum_val1="On Faces" enum_val0="On vertices"/>
   <Param type="RichInt" name="numberRays" tooltip="The number of rays that will be casted around the normals." description="Number of rays: " value="128" isxmlparam="0"/>
   <Param type="RichInt" name="DepthTextureSize" tooltip="Size of the depth texture for depth peeling. Higher resolutions provide better sampling of the mesh, with a small performance penalty." description="Depth texture size" value="512" isxmlparam="0"/>
-  <Param type="RichInt" name="peelingIteration" tooltip="Number of depth peeling iteration. Actually is the maximum number of layers that a ray can hit while traversing the mesh. For example, in the case of a sphere, you should specify 2 in this parameter. For a torus, specify 4. &lt;b>For more complex geometry you should run the depth complexity filter to know the exact value&lt;/b>." description="Peeling Iteration" value="10" isxmlparam="0"/>
+  <Param type="RichInt" name="peelingIteration" tooltip="Number of depth peeling iteration. Actually is the maximum number of layers that a ray can hit while traversing the mesh. For example, in the case of a sphere, you should specify 2 in this parameter. For a torus, specify 4. &lt;b>For more complex geometry you should run the depth complexity filter to know the exact value&lt;/b>." description="Peeling Iteration" value="256" isxmlparam="0"/>
   <Param type="RichFloat" name="peelingTolerance" tooltip="Depth tolerance used during depth peeling. This is the threshold used to differentiate layers between each others.Two elements whose distance is below this value will be considered as belonging to the same layer." description="Peeling Tolerance" value="1e-07" isxmlparam="0"/>
   <Param type="RichFloat" name="coneAngle" tooltip="Cone amplitude around normals in degrees. Rays are traced within this cone." description="Cone amplitude" value="120" isxmlparam="0"/>
   <Param type="RichFloat" name="obscuranceExponent" tooltip="This parameter controls the spatial decay term in the obscurance formula. The greater the exponent, the greater the influence of distance; that is: even if a ray is blocked by an occluder its contribution to the obscurance term is non zero, but proportional to this parameter. It turs out that if you choose a value of zero, you get the standard ambient occlusion term. &lt;b>(In this case, only a value of two, in the peeling iteration parameter, has a sense)&lt;/b>" description="Obscurance Exponent" value="0.1" isxmlparam="0"/>
