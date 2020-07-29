@@ -48,8 +48,15 @@
  </filter>
  -->
  <!--
+ -->
+ <filter name="Taubin Smooth">
+  <Param description="Lambda" name="lambda" type="RichFloat" isxmlparam="0" value="0.005" tooltip="The lambda parameter of the Taubin Smoothing algorithm"/>
+  <Param description="mu" name="mu" type="RichFloat" isxmlparam="0" value="0.001" tooltip="The mu parameter of the Taubin Smoothing algorithm"/>
+  <Param description="Smoothing steps" name="stepSmoothNum" type="RichInt" isxmlparam="0" value="32" tooltip="The number of times that the taubin smoothing is iterated. Usually it requires a larger number of iteration than the classical laplacian"/>
+  <Param description="Affect only selected faces" name="Selected" type="RichBool" isxmlparam="0" value="false" tooltip="If checked the filter is performed only on the selected faces"/>
+ </filter>
  <filter name="Simplification: Quadric Edge Collapse Decimation">
-  <Param isxmlparam="0" description="Target number of faces" type="RichInt" value="80" tooltip="The desired final number of faces." name="TargetFaceNum"/>
+  <Param isxmlparam="0" description="Target number of faces" type="RichInt" value="4096" tooltip="The desired final number of faces." name="TargetFaceNum"/>
   <Param isxmlparam="0" description="Percentage reduction (0..1)" type="RichFloat" value="0" tooltip="If non zero, this parameter specifies the desired final size of the mesh as a percentage of the initial size." name="TargetPerc"/>
   <Param isxmlparam="0" description="Quality threshold" type="RichFloat" value="0.001" tooltip="Quality threshold for penalizing bad shaped faces.&lt;br>The value is in the range [0..1]&#xa; 0 accept any kind of face (no penalties),&#xa; 0.5  penalize faces with quality &lt; 0.5, proportionally to their shape&#xa;" name="QualityThr"/>
   <Param isxmlparam="0" description="Preserve Boundary of the mesh" type="RichBool" value="true" tooltip="The simplification process tries to do not affect mesh boundaries during simplification" name="PreserveBoundary"/>
@@ -63,24 +70,6 @@
   <Param isxmlparam="0" description="Post-simplification cleaning" type="RichBool" value="true" tooltip="After the simplification an additional set of steps is performed to clean the mesh (unreferenced vertices, bad faces, etc)" name="AutoClean"/>
   <Param isxmlparam="0" description="Simplify only selected faces" type="RichBool" value="false" tooltip="The simplification is applied only to the selected set of faces.&#xa; Take care of the target number of faces!" name="Selected"/>
  </filter>
- -->
- <!--
- <filter name="Ambient Occlusion">
-  <Param name="occMode" isxmlparam="0" enum_val1="per-Face (deprecated)" enum_cardinality="2" enum_val0="per-Vertex" value="0" description="Occlusion mode:" type="RichEnum" tooltip="Occlusion may be calculated per-vertex or per-face, color and quality will be saved in the chosen component."/>
-  <Param name="dirBias" isxmlparam="0" value="0.9" description="Directional Bias [0..1]" type="RichFloat" tooltip="The balance between a uniform and a directionally biased set of lighting direction&lt;br>: - 0 means light came only uniformly from any direction&lt;br> - 1 means that all the light cames from the specified cone of directions &lt;br> - other values mix the two set of lighting directions "/>
-  <Param name="reqViews" isxmlparam="0" value="32" description="Requested views" type="RichInt" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time"/>
-  <Param name="coneDir" isxmlparam="0" z="0" description="Lighting Direction" type="RichPoint3f" tooltip="Number of different views placed around the mesh. More views means better accuracy at the cost of increased calculation time" x="0.5" y="1"/>
-  <Param name="coneAngle" isxmlparam="0" value="32" description="Cone amplitude" type="RichFloat" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time"/>
-  <Param name="useGPU" isxmlparam="0" value="false" description="Use GPU acceleration" type="RichBool" tooltip="Only works for per-vertex AO. In order to use GPU-Mode, your hardware must support FBOs, FP32 Textures and Shaders. Normally increases the performance by a factor of 4x-5x"/>
-  <Param name="depthTexSize" isxmlparam="0" value="128" description="Depth texture size(should be 2^n)" type="RichInt" tooltip="Defines the depth texture size used to compute occlusion from each point of view. Higher values means better accuracy usually with low impact on performance"/>
- </filter>
- -->
- <filter name="Taubin Smooth">
-  <Param description="Lambda" name="lambda" type="RichFloat" isxmlparam="0" value="3" tooltip="The lambda parameter of the Taubin Smoothing algorithm"/>
-  <Param description="mu" name="mu" type="RichFloat" isxmlparam="0" value="3" tooltip="The mu parameter of the Taubin Smoothing algorithm"/>
-  <Param description="Smoothing steps" name="stepSmoothNum" type="RichInt" isxmlparam="0" value="1" tooltip="The number of times that the taubin smoothing is iterated. Usually it requires a larger number of iteration than the classical laplacian"/>
-  <Param description="Affect only selected faces" name="Selected" type="RichBool" isxmlparam="0" value="false" tooltip="If checked the filter is performed only on the selected faces"/>
- </filter>
  <filter name="Volumetric obscurance">
   <Param type="RichEnum" enum_cardinality="2" name="onPrimitive" tooltip="Choose whether to trace rays from faces or from vertices. " description="Metric:" value="0" isxmlparam="0" enum_val1="On Faces" enum_val0="On vertices"/>
   <Param type="RichInt" name="numberRays" tooltip="The number of rays that will be casted around the normals." description="Number of rays: " value="128" isxmlparam="0"/>
@@ -89,6 +78,15 @@
   <Param type="RichFloat" name="peelingTolerance" tooltip="Depth tolerance used during depth peeling. This is the threshold used to differentiate layers between each others.Two elements whose distance is below this value will be considered as belonging to the same layer." description="Peeling Tolerance" value="1e-07" isxmlparam="0"/>
   <Param type="RichFloat" name="coneAngle" tooltip="Cone amplitude around normals in degrees. Rays are traced within this cone." description="Cone amplitude" value="120" isxmlparam="0"/>
   <Param type="RichFloat" name="obscuranceExponent" tooltip="This parameter controls the spatial decay term in the obscurance formula. The greater the exponent, the greater the influence of distance; that is: even if a ray is blocked by an occluder its contribution to the obscurance term is non zero, but proportional to this parameter. It turs out that if you choose a value of zero, you get the standard ambient occlusion term. &lt;b>(In this case, only a value of two, in the peeling iteration parameter, has a sense)&lt;/b>" description="Obscurance Exponent" value="0.1" isxmlparam="0"/>
+ </filter>
+ <filter name="Ambient Occlusion">
+  <Param name="occMode" isxmlparam="0" enum_val1="per-Face (deprecated)" enum_cardinality="2" enum_val0="per-Vertex" value="0" description="Occlusion mode:" type="RichEnum" tooltip="Occlusion may be calculated per-vertex or per-face, color and quality will be saved in the chosen component."/>
+  <Param name="dirBias" isxmlparam="0" value="0.9" description="Directional Bias [0..1]" type="RichFloat" tooltip="The balance between a uniform and a directionally biased set of lighting direction&lt;br>: - 0 means light came only uniformly from any direction&lt;br> - 1 means that all the light cames from the specified cone of directions &lt;br> - other values mix the two set of lighting directions "/>
+  <Param name="reqViews" isxmlparam="0" value="32" description="Requested views" type="RichInt" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time"/>
+  <Param name="coneDir" isxmlparam="0" z="0" description="Lighting Direction" type="RichPoint3f" tooltip="Number of different views placed around the mesh. More views means better accuracy at the cost of increased calculation time" x="0.5" y="1"/>
+  <Param name="coneAngle" isxmlparam="0" value="32" description="Cone amplitude" type="RichFloat" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time"/>
+  <Param name="useGPU" isxmlparam="0" value="false" description="Use GPU acceleration" type="RichBool" tooltip="Only works for per-vertex AO. In order to use GPU-Mode, your hardware must support FBOs, FP32 Textures and Shaders. Normally increases the performance by a factor of 4x-5x"/>
+  <Param name="depthTexSize" isxmlparam="0" value="128" description="Depth texture size(should be 2^n)" type="RichInt" tooltip="Defines the depth texture size used to compute occlusion from each point of view. Higher values means better accuracy usually with low impact on performance"/>
  </filter>
  <filter name="Transfer: Vertex Color to Texture">
   <Param name="textName" tooltip="The texture file to be created" isxmlparam="0" value="shape-null_tex.png" type="RichString" description="Texture file"/>

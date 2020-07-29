@@ -185,7 +185,7 @@ class MazeGame
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 120.0
+    @fovy = 20.0
     @maze_draw_distance = 2
 
     @cool_down = [99, 99]
@@ -533,7 +533,7 @@ class MazeGame
 
       #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
       #@camera_position[0] = -1 + px
-      @camera_position[1] = 0.5
+      @camera_position[1] = 1.25
       #@camera_position[2] = -1 + py
       #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
 
@@ -550,7 +550,7 @@ class MazeGame
       @camera_target[2] = @player_position[2]
 
       @camera_position[0] = @camera_target[0] - 0.0
-      @camera_position[2] = @camera_target[2] - 0.234
+      @camera_position[2] = @camera_target[2] - 0.125
 
       if px != @cpx
         @cpx = px
