@@ -185,7 +185,7 @@ class MazeGame
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 20.0
+    @fovy = 40.0
     @maze_draw_distance = 2
 
     @cool_down = [99, 99]
@@ -230,17 +230,18 @@ class MazeGame
     rfy = 1.0
     cool_down_t = 0.125
     gravity = 12.0
-    hop_timeout = 0.3
+    hop_timeout = 0.1
     hop_ratio = (@player_velocity[0].abs) + (@player_velocity[2].abs)
     hop_speed = (0.3) + (Math.sqrt(hop_ratio) * 1.0)
     did_hop = false
 
-    #if @time_since_last_hop > hop_timeout
-    #  @time_since_last_hop = 0
+    if @time_since_last_hop > hop_timeout
+      @time_since_last_hop = 0
+      dice_roll_draw_buffer
     #  @player_velocity[1] = hop_speed
     #  did_hop = true
     #  speed = speed * 15.0
-    #end 
+    end 
 
     this_direction = 2.33
 
@@ -533,7 +534,7 @@ class MazeGame
 
       #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
       #@camera_position[0] = -1 + px
-      @camera_position[1] = 1.25
+      @camera_position[1] = 5.25
       #@camera_position[2] = -1 + py
       #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
 
@@ -546,11 +547,11 @@ class MazeGame
       #@camera_position[0] = px - 1.33
       #@camera_position[2] = py - 1.77
 
-      @camera_target[0] = @player_position[0]
-      @camera_target[2] = @player_position[2]
+      @camera_target[0] -= (@camera_target[0] - (@player_position[0] + (0.25 * @player_velocity[0]))) * (delta_time * 1.0)
+      @camera_target[2] -= (@camera_target[2] - (@player_position[2] + (0.25 * @player_velocity[2]))) * (delta_time * 1.0)
 
       @camera_position[0] = @camera_target[0] - 0.0
-      @camera_position[2] = @camera_target[2] - 0.125
+      @camera_position[2] = @camera_target[2] - 2.5
 
       if px != @cpx
         @cpx = px
@@ -572,13 +573,19 @@ class MazeGame
           unless cell == 0
             #[x, y] != [px, py] && [x, y] != [px-1, py]
             #[x, y] != [px, py] && [x, y] != [px-1, py]
-            if ((x > (px)) && (y > (py))) ||
-            ((x < (px)) && (y < (py)))
+            #if ((x > (px)) && (y > (py))) ||
+            #((x < (px)) && (y < (py)))
+            #if (x == px && y = py) ||
+            #  (x == (px+1) && y == py) ||
+            #  (x == (px-1) && y == py) ||
+            #  (x == px && y == (py+1)) ||
+            #  (x == px && y == (py-1))
+            if (x == px || y == py)
+              primary = (cell & PRIMARY)
+            else
               primary = @draw_buffer[dbi]
               #primary = (cell & PRIMARY)
               dbi += 1
-            else
-              primary = (cell & PRIMARY)
             end
 
             if shape = @shapes[primary]

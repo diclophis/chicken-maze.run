@@ -26,20 +26,23 @@
  </filter>
 
  <filter name="Subdivision Surfaces: Midpoint">
-  <Param type="RichInt" value="4" name="Iterations"/>
+  <Param type="RichInt" value="1" name="Iterations"/>
   <Param type="RichAbsPerc" value="1e-06" min="0" name="Threshold" max="1.5"/>
   <Param type="RichBool" value="false" name="Selected"/>
  </filter>
 
  <filter name="Parametrization: Trivial Per-Triangle">
   <Param name="sidedim" isxmlparam="0" value="0" description="Quads per line" type="RichInt" tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation"/>
-  <Param name="textdim" isxmlparam="0" value="1024" description="Texture Dimension (px)" type="RichInt" tooltip="Gives an indication on how big the texture is"/>
+  <Param name="textdim" isxmlparam="0" value="2048" description="Texture Dimension (px)" type="RichInt" tooltip="Gives an indication on how big the texture is"/>
   <Param name="border" isxmlparam="0" value="2" description="Inter-Triangle border (px)" type="RichInt" tooltip="Specifies how many pixels to be left between triangles in parametrization domain"/>
   <Param name="method" isxmlparam="0" enum_val1="Space-optimizing" enum_cardinality="2" enum_val0="Basic" value="1" description="Method" type="RichEnum" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain"/>
  </filter>
+
+<!--
  <filter name="Merge Wedge Texture Coord">
-  <Param name="MergeThr" isxmlparam="0" value="0.0001" description="Merging Threshold" type="RichFloat" tooltip="All the per-wedge texture coords that are on the same vertex and are distant less then the given threshold are merged together. It can be used to remove the fake texture seams that arise from error. Distance is in texture space (the default, 1e-4, corresponds to one texel on a 10kx10x texture) "/>
+  <Param name="MergeThr" isxmlparam="0" value="0.1" description="Merging Threshold" type="RichFloat" tooltip="All the per-wedge texture coords that are on the same vertex and are distant less then the given threshold are merged together. It can be used to remove the fake texture seams that arise from error. Distance is in texture space (the default, 1e-4, corresponds to one texel on a 10kx10x texture) "/>
  </filter>
+-->
 
  <!--
  <filter name="Simplification: Clustering Decimation">
@@ -48,13 +51,6 @@
  </filter>
  -->
  <!--
- -->
- <filter name="Taubin Smooth">
-  <Param description="Lambda" name="lambda" type="RichFloat" isxmlparam="0" value="0.005" tooltip="The lambda parameter of the Taubin Smoothing algorithm"/>
-  <Param description="mu" name="mu" type="RichFloat" isxmlparam="0" value="0.001" tooltip="The mu parameter of the Taubin Smoothing algorithm"/>
-  <Param description="Smoothing steps" name="stepSmoothNum" type="RichInt" isxmlparam="0" value="32" tooltip="The number of times that the taubin smoothing is iterated. Usually it requires a larger number of iteration than the classical laplacian"/>
-  <Param description="Affect only selected faces" name="Selected" type="RichBool" isxmlparam="0" value="false" tooltip="If checked the filter is performed only on the selected faces"/>
- </filter>
  <filter name="Simplification: Quadric Edge Collapse Decimation">
   <Param isxmlparam="0" description="Target number of faces" type="RichInt" value="4096" tooltip="The desired final number of faces." name="TargetFaceNum"/>
   <Param isxmlparam="0" description="Percentage reduction (0..1)" type="RichFloat" value="0" tooltip="If non zero, this parameter specifies the desired final size of the mesh as a percentage of the initial size." name="TargetPerc"/>
@@ -70,6 +66,7 @@
   <Param isxmlparam="0" description="Post-simplification cleaning" type="RichBool" value="true" tooltip="After the simplification an additional set of steps is performed to clean the mesh (unreferenced vertices, bad faces, etc)" name="AutoClean"/>
   <Param isxmlparam="0" description="Simplify only selected faces" type="RichBool" value="false" tooltip="The simplification is applied only to the selected set of faces.&#xa; Take care of the target number of faces!" name="Selected"/>
  </filter>
+ -->
  <filter name="Volumetric obscurance">
   <Param type="RichEnum" enum_cardinality="2" name="onPrimitive" tooltip="Choose whether to trace rays from faces or from vertices. " description="Metric:" value="0" isxmlparam="0" enum_val1="On Faces" enum_val0="On vertices"/>
   <Param type="RichInt" name="numberRays" tooltip="The number of rays that will be casted around the normals." description="Number of rays: " value="128" isxmlparam="0"/>
@@ -79,6 +76,7 @@
   <Param type="RichFloat" name="coneAngle" tooltip="Cone amplitude around normals in degrees. Rays are traced within this cone." description="Cone amplitude" value="120" isxmlparam="0"/>
   <Param type="RichFloat" name="obscuranceExponent" tooltip="This parameter controls the spatial decay term in the obscurance formula. The greater the exponent, the greater the influence of distance; that is: even if a ray is blocked by an occluder its contribution to the obscurance term is non zero, but proportional to this parameter. It turs out that if you choose a value of zero, you get the standard ambient occlusion term. &lt;b>(In this case, only a value of two, in the peeling iteration parameter, has a sense)&lt;/b>" description="Obscurance Exponent" value="0.1" isxmlparam="0"/>
  </filter>
+ <!--
  <filter name="Ambient Occlusion">
   <Param name="occMode" isxmlparam="0" enum_val1="per-Face (deprecated)" enum_cardinality="2" enum_val0="per-Vertex" value="0" description="Occlusion mode:" type="RichEnum" tooltip="Occlusion may be calculated per-vertex or per-face, color and quality will be saved in the chosen component."/>
   <Param name="dirBias" isxmlparam="0" value="0.9" description="Directional Bias [0..1]" type="RichFloat" tooltip="The balance between a uniform and a directionally biased set of lighting direction&lt;br>: - 0 means light came only uniformly from any direction&lt;br> - 1 means that all the light cames from the specified cone of directions &lt;br> - other values mix the two set of lighting directions "/>
@@ -88,6 +86,7 @@
   <Param name="useGPU" isxmlparam="0" value="false" description="Use GPU acceleration" type="RichBool" tooltip="Only works for per-vertex AO. In order to use GPU-Mode, your hardware must support FBOs, FP32 Textures and Shaders. Normally increases the performance by a factor of 4x-5x"/>
   <Param name="depthTexSize" isxmlparam="0" value="128" description="Depth texture size(should be 2^n)" type="RichInt" tooltip="Defines the depth texture size used to compute occlusion from each point of view. Higher values means better accuracy usually with low impact on performance"/>
  </filter>
+ -->
  <filter name="Transfer: Vertex Color to Texture">
   <Param name="textName" tooltip="The texture file to be created" isxmlparam="0" value="shape-null_tex.png" type="RichString" description="Texture file"/>
   <Param name="textW" tooltip="The texture width" isxmlparam="0" value="1024" type="RichInt" description="Texture width (px)"/>
