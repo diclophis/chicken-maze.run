@@ -1,4 +1,4 @@
-FROM wkndr:latest
+FROM wkndr:latest AS wkndr
 
 COPY resources/* /var/lib/wkndr/resources/
 COPY Wkndrfile /var/lib/wkndr/
