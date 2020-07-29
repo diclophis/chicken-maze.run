@@ -50,7 +50,7 @@ do
   sed -i -e "s~map_Kd\ ~map_Kd\ $THIS_WORKING_DIR/tmp/~" tmp/shape-${I}.obj.mtl
   sed -i -e "s~shape-null~shape-$I~" tmp/shape-${I}.obj.mtl
 
-  assimp export tmp/shape-${I}.obj tmp/shape-${I}.glb -fglb2 -embtex --flip-uv --improve-cache-locality --remove-redundant-materials
+  assimp export tmp/shape-${I}.obj tmp/shape-${I}.glb -fglb2 -embtex --flip-uv --improve-cache-locality --remove-redundant-materials --join-identical-vertices --validate-data-structure -om -og -l -v 
 done
 
 cp tmp/shape-*.glb resources/
