@@ -97,17 +97,10 @@ class MazeGame
 
     @enforce_bounds = true
 
-    @maze_s = (maze_size + 1) * (maze_size + 1)
-
-    braid = 57
-    weave = 0 #TODO
-    sparse = 3
-    randomness = 71
-
+    #(maze_size + 1) * (maze_size + 1)
     #TODO:
     #@exit = [(rand * @maze_s).to_i, (rand * @maze_s).to_i]
     #log!(:exit, @exit)
-
     ## generate a orthogonal maze
     #@maze = Theseus::OrthogonalMaze.generate({
     #  :wrap => "xy",
@@ -119,21 +112,17 @@ class MazeGame
     #  :randomness => randomness,
     #  :exit => @exit
     #})
-    @maze = []
-    @maze_s.times { |w|
-      @maze[w] ||= []
-      @maze_s.times { |h|
-        @maze[w][h] = 15 #(rand * 15.0).to_i
-      }
-    }
-
+    #@maze = []
+    #@maze_s.times { |w|
+    #  @maze[w] ||= []
+    #  @maze_s.times { |h|
+    #    @maze[w][h] = 15 #(rand * 15.0).to_i
+    #  }
+    #}
     #@maze[0][0] = 1
     #@maze[1][1] = 2
-
     #raise @maze.inspect
-
-    @maze_exit = [@maze_s-1, @maze_s-1]
-
+    #@maze_exit = [@maze_s-1, @maze_s-1]
     #enter_at = [0, 0]
     #exit_at = [0,1]
 
@@ -186,7 +175,7 @@ class MazeGame
     @lin_y2 = 0.0
 
     @fovy = 40.0
-    @maze_draw_distance = 2
+    @maze_draw_distance = 10
 
     @cool_down = [99, 99]
 
@@ -196,6 +185,12 @@ class MazeGame
     dice_roll_draw_buffer
   end
 
+  def load_maze(s, e, b)
+    @maze_s = s
+    @maze_exit = e
+    @maze = b
+  end
+
   def dice_roll_draw_buffer
     @draw_buffer = []
     (((@maze_draw_distance + 1) * 2) * ((@maze_draw_distance + 1) * 2)).times {
@@ -203,7 +198,9 @@ class MazeGame
     }
   end
 
-  def update_and_draw_threed(gl, global_time, delta_time)
+  def update_and_draw_threed(gl, global_time, delta_time, positions)
+    return unless @maze
+
     px = py = nx = ny = 0
     got_lr = got_ud = false
     player_at_shape = nil
@@ -238,6 +235,7 @@ class MazeGame
     if @time_since_last_hop > hop_timeout
       @time_since_last_hop = 0
       dice_roll_draw_buffer
+      gl.emit({"position" => {$HEX => @player_position}})
     #  @player_velocity[1] = hop_speed
     #  did_hop = true
     #  speed = speed * 15.0
@@ -534,7 +532,7 @@ class MazeGame
 
       #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
       #@camera_position[0] = -1 + px
-      @camera_position[1] = 5.25
+      @camera_position[1] = 20.25
       #@camera_position[2] = -1 + py
       #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
 
@@ -551,7 +549,7 @@ class MazeGame
       @camera_target[2] -= (@camera_target[2] - (@player_position[2] + (0.25 * @player_velocity[2]))) * (delta_time * 1.0)
 
       @camera_position[0] = @camera_target[0] - 0.0
-      @camera_position[2] = @camera_target[2] - 2.5
+      @camera_position[2] = @camera_target[2] - 1.5
 
       if px != @cpx
         @cpx = px
@@ -580,13 +578,13 @@ class MazeGame
             #  (x == (px-1) && y == py) ||
             #  (x == px && y == (py+1)) ||
             #  (x == px && y == (py-1))
-            if (x == px || y == py)
+            #if (x == px || y == py)
               primary = (cell & PRIMARY)
-            else
-              primary = @draw_buffer[dbi]
-              #primary = (cell & PRIMARY)
-              dbi += 1
-            end
+            #else
+            #  primary = @draw_buffer[dbi]
+            #  #primary = (cell & PRIMARY)
+            #  dbi += 1
+            #end
 
             if shape = @shapes[primary]
               shape.deltap(x, 0, y)
@@ -600,6 +598,11 @@ class MazeGame
     @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
     @cube.deltap(*@player_position)
     @cube.draw(false)
+    
+    positions.each { |key, rpp|
+      @cube.deltap(*rpp)
+      @cube.draw(false)
+    }
 
     :keep_running
   end
@@ -625,20 +628,28 @@ Wkndr.server_side { |gl, server|
   end
 }
 
+@positions = {}
+
 Wkndr.client_side { |gl|
+  gl.event { |channel, msg|
+    case channel
+      when "position"
+        #@spawn_proc.call(*msg) if (@spawn_proc && @store)
+        @positions.merge!(msg)
+
+      when "maze"
+        @maze_game.load_maze(*msg)
+    end
+  }
+
   gl.update { |global_time, delta_time|
     gl.drawmode {
-      #overdraw = 3.0
-      #inc_time = (delta_time / overdraw)
-      #overdraw.to_i.times { |i|
-        gl.threed {
-          #case @maze_game.update_and_draw_threed(gl, global_time - (overdraw * (overdraw - i).to_f), inc_time)
-          case @maze_game.update_and_draw_threed(gl, global_time, delta_time)
-            when :restart
-              @start_game_proc.call
-          end
-        }
-      #}
+      gl.threed {
+        case @maze_game.update_and_draw_threed(gl, global_time, delta_time, @positions)
+          when :restart
+            @start_game_proc.call
+        end
+      }
     }
   }
 }
