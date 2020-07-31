@@ -3375,14 +3375,23 @@ Wkndr.client_side { |gl|
   gl.event { |channel, msg|
     case channel
       when "mkmaze"
-        braid = 57
+        #braid = 57
+        #weave = 0 #TODO
+        #sparse = 3
+        #randomness = 71
+
+        braid = rand * 100.0
         weave = 0 #TODO
-        sparse = 3
-        randomness = 71
+        sparse = rand * 100.0
+        randomness = rand * 100.0
 
         maze_s = (msg.to_i * msg.to_i)
 
-        exit = [maze_s, maze_s-1]
+        #if msg.to_i < 2
+          exit = [maze_s, maze_s-1]
+        #else
+        #  exit = [-1, 2]
+        #end
 
         # generate a orthogonal maze
         maze = Theseus::OrthogonalMaze.generate({

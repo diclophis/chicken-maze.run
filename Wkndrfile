@@ -40,14 +40,12 @@ class MazeGame
     @shapes = shapes
     @shape_translate_table = shape_translate_table
 
+    chicken_file = "resources/chicken.glb"
+    @cube = Model.new(chicken_file, "", 0.125)
+
     @cpx = -1
     @cpy = -1
 
-    chicken_file = "resources/chicken.glb"
-    #chicken_file = "resources/shape-0.gltf"
-    @cube = Model.new(chicken_file, "", 0.125)
-    #@cube = Model.new(chicken_file, "", 0.1)
-    #@cube = Cube.new(0.1, 0.1, 0.1, 1.0)
     @at_exit_time = 0.0
 
     @enforce_bounds = true
@@ -91,8 +89,8 @@ class MazeGame
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 60.0
-    @maze_draw_distance = 4
+    @fovy = 50.0
+    @maze_draw_distance = 3
 
     @cool_down = [99, 99]
 
@@ -467,7 +465,7 @@ class MazeGame
       @camera_target[0] -= (@camera_target[0] - (@player_position[0] + (0.25 * @player_velocity[0]))) * (delta_time * 1.0)
       @camera_target[2] -= (@camera_target[2] - (@player_position[2] + (0.25 * @player_velocity[2]))) * (delta_time * 1.0)
 
-      @camera_position[0] = @camera_target[0] - 0.0
+      @camera_position[0] = @camera_target[0]
       @camera_position[2] = @camera_target[2] - 1.5
 
       if px != @cpx
