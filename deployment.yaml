@@ -25,12 +25,25 @@ spec:
         - containerPort: 8000
         resources:
           limits:
-            memory: 100M
-            cpu: 200m
+            memory: 1024M
+            cpu: 100m
           requests:
             memory: 100M
             cpu: 100m
         volumeMounts: []
+      - name: mkmaze
+        image: chicken-maze.run:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/var/lib/wkndr/release/wkndr.mruby", "--no-server", "--party=/var/lib/wkndr/doc/Wkndrfile"]
+        resources:
+          limits:
+            memory: 1024M
+            cpu: 100m
+          requests:
+            memory: 100M
+            cpu: 100m
+        volumeMounts: []
+
 
 ---
 apiVersion: v1

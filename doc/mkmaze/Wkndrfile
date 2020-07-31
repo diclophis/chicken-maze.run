@@ -3380,6 +3380,8 @@ Wkndr.client_side { |gl|
         #sparse = 3
         #randomness = 71
 
+        srand(msg.to_i)
+
         braid = rand * 100.0
         weave = 0 #TODO
         sparse = rand * 100.0
