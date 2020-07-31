@@ -103,7 +103,7 @@ class MazeGame
     @players = {}
   end
 
-  def load_maze(l, s, e, b)
+  def load_maze!(l, s, e, b)
     if @maze_level == l
       @maze_s = s
       @maze_exit = e
@@ -146,8 +146,7 @@ class MazeGame
     rfx = 1.0
     rfy = 1.0
     cool_down_t = 0.125
-    gravity = 12.0
-    hop_timeout = 0.1
+    hop_timeout = 0.25
     hop_ratio = (@player_velocity[0].abs) + (@player_velocity[2].abs)
     hop_speed = (0.3) + (Math.sqrt(hop_ratio) * 1.0)
     did_hop = false
@@ -449,7 +448,7 @@ class MazeGame
 
       #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
       #@camera_position[0] = -1 + px
-      @camera_position[1] = 2.25
+      @camera_position[1] = 2.0
       #@camera_position[2] = -1 + py
       #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
 
@@ -519,11 +518,10 @@ class MazeGame
     @players.each { |key, rpv|
       player_position, player_velocity = *rpv
 
+      player_position[0] += (player_velocity[0] * delta_time * 1.0)
+      player_position[2] += (player_velocity[2] * delta_time * 1.0)
+
       @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
-
-      player_position[0] += (player_velocity[0] * delta_time * 0.5)
-      player_position[2] += (player_velocity[2] * delta_time * 0.5)
-
       @cube.deltap(*player_position)
       @cube.draw(false)
     }
@@ -616,11 +614,10 @@ Wkndr.client_side { |gl|
   gl.event { |channel, msg|
     case channel
       when "position"
-        #@spawn_proc.call(*msg) if (@spawn_proc && @store)
         @maze_game.track_other_players!(msg)
 
       when "maze"
-        @maze_game.load_maze(*msg)
+        @maze_game.load_maze!(*msg)
     end
   }
 
