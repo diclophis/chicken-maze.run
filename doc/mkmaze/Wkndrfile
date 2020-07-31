@@ -3375,6 +3375,8 @@ Wkndr.client_side { |gl|
   gl.event { |channel, msg|
     case channel
       when "mkmaze"
+        srand(msg.to_i)
+
         braid = 57
         weave = 0 #TODO
         sparse = 3
