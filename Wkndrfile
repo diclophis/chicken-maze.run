@@ -145,7 +145,7 @@ class MazeGame
     max_v = 1.0
     rfx = 1.0
     rfy = 1.0
-    hop_timeout = 0.25
+    hop_timeout = 0.125
     did_hop = false
 
     if @time_since_last_hop > hop_timeout
@@ -405,8 +405,8 @@ class MazeGame
     @players.each { |key, rpv|
       player_position, player_velocity = *rpv
 
-      player_position[0] += (player_velocity[0] * delta_time * 1.0)
-      player_position[2] += (player_velocity[2] * delta_time * 1.0)
+      player_position[0] += (player_velocity[0] * delta_time * 0.99)
+      player_position[2] += (player_velocity[2] * delta_time * 0.99)
 
       @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
       @cube.deltap(*player_position)
