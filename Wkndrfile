@@ -36,57 +36,12 @@ class MazeGame
     end
   end
 
-  def initialize(maze_level)
+  def initialize(maze_level, shapes, shape_translate_table)
+    @shapes = shapes
+    @shape_translate_table = shape_translate_table
+
     @cpx = -1
     @cpy = -1
-
-    @shapes = {}
-    @shape_translate_table = {}
-
-    16.times { |i|
-      ii = begin
-        case i
-          when 1
-            8
-          when 2
-            7
-          when 3
-            9
-          when 4
-            6
-          when 5
-            12
-          when 6
-            11
-          when 7
-            3
-          when 8
-            5
-          when 9
-            13
-          when 10
-            14
-          when 11
-            4
-          when 12
-            10
-          when 13
-            1
-          when 14
-            2
-          when 15
-            0
-        else
-          nil
-        end
-      end
-
-      if ii
-        @shape_translate_table[i] = ii
-        shape_file = "resources/shape-#{ii}.glb"
-        @shapes[i] = Model.new(shape_file, "", 1.0)
-      end
-    }
 
     chicken_file = "resources/chicken.glb"
     #chicken_file = "resources/shape-0.gltf"
@@ -594,10 +549,59 @@ Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
 
+    shapes = {}
+    shape_translate_table = {}
+
+    16.times { |i|
+      ii = begin
+        case i
+          when 1
+            8
+          when 2
+            7
+          when 3
+            9
+          when 4
+            6
+          when 5
+            12
+          when 6
+            11
+          when 7
+            3
+          when 8
+            5
+          when 9
+            13
+          when 10
+            14
+          when 11
+            4
+          when 12
+            10
+          when 13
+            1
+          when 14
+            2
+          when 15
+            0
+        else
+          nil
+        end
+      end
+
+      if ii
+        shape_translate_table[i] = ii
+        shape_file = "resources/shape-#{ii}.glb"
+        shapes[i] = Model.new(shape_file, "", 1.0)
+      end
+    }
+
+
     @start_game_proc = Proc.new {
       @maze_level ||= 0
       @maze_level += 1
-      @maze_game = MazeGame.new(@maze_level)
+      @maze_game = MazeGame.new(@maze_level, shapes, shape_translate_table)
       gl.emit({"mkmaze" => @maze_level})
     }
 
