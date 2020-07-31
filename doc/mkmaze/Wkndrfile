@@ -3373,36 +3373,38 @@ Wkndr.nonce {
 
 Wkndr.client_side { |gl|
   gl.event { |channel, msg|
+    case channel
+      when "mkmaze"
+        braid = 57
+        weave = 0 #TODO
+        sparse = 3
+        randomness = 71
+
+        maze_s = (msg.to_i * msg.to_i)
+
+        exit = [maze_s, maze_s-1]
+
+        # generate a orthogonal maze
+        maze = Theseus::OrthogonalMaze.generate({
+          :wrap => "xy",
+          :width => maze_s,
+          :height => maze_s,
+          :braid => braid,
+          :weave => weave,
+          :sparse => sparse,
+          :randomness => randomness,
+          :exit => exit
+        })
+
+        out = []
+        maze_s.times { |w|
+          out[w] ||= []
+          maze_s.times { |h|
+            out[w][h] = maze[w, h]
+          }
+        }
+
+        gl.emit({"maze" => [msg.to_i, maze_s, exit, out]})
+    end
   }
-
-  braid = 57
-  weave = 0 #TODO
-  sparse = 3
-  randomness = 71
-
-  maze_s = 5
-
-  exit = [maze_s-1, maze_s-1]
-
-  # generate a orthogonal maze
-  maze = Theseus::OrthogonalMaze.generate({
-    :wrap => "xy",
-    :width => maze_s,
-    :height => maze_s,
-    :braid => braid,
-    :weave => weave,
-    :sparse => sparse,
-    :randomness => randomness,
-    :exit => exit
-  })
-
-  out = []
-  maze_s.times { |w|
-    out[w] ||= []
-    maze_s.times { |h|
-      out[w][h] = maze[w, h]
-    }
-  }
-
-  gl.emit({"maze" => [maze_s, exit, out]})
 }

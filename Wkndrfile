@@ -36,7 +36,7 @@ class MazeGame
     end
   end
 
-  def initialize(maze_size)
+  def initialize(maze_level)
     @cpx = -1
     @cpy = -1
 
@@ -97,46 +97,8 @@ class MazeGame
 
     @enforce_bounds = true
 
-    #(maze_size + 1) * (maze_size + 1)
-    #TODO:
-    #@exit = [(rand * @maze_s).to_i, (rand * @maze_s).to_i]
-    #log!(:exit, @exit)
-    ## generate a orthogonal maze
-    #@maze = Theseus::OrthogonalMaze.generate({
-    #  :wrap => "xy",
-    #  :width => @maze_s,
-    #  :height => @maze_s,
-    #  :braid => braid,
-    #  :weave => weave,
-    #  :sparse => sparse,
-    #  :randomness => randomness,
-    #  :exit => @exit
-    #})
-    #@maze = []
-    #@maze_s.times { |w|
-    #  @maze[w] ||= []
-    #  @maze_s.times { |h|
-    #    @maze[w][h] = 15 #(rand * 15.0).to_i
-    #  }
-    #}
-    #@maze[0][0] = 1
-    #@maze[1][1] = 2
-    #raise @maze.inspect
-    #@maze_exit = [@maze_s-1, @maze_s-1]
-    #enter_at = [0, 0]
-    #exit_at = [0,1]
-
-    #if enter_at[0] > 0 && enter_at[0] < @maze_s*2
-    #  exit_at = [enter_at[0]+1, enter_at[1]]
-    #else
-    #  exit_at = [enter_at[0], enter_at[1]+1]
-    #end
-    #@maze = @maze.to_unicursal(entrance: enter_at, exit: exit_at)
-    #@maze_s *= 2
-
     @floor_position = 0.125
 
-    #@player_position = [0.0,@floor_position-0.1,0.0]
     @player_position = [0.0,@floor_position-0.025,0.0]
     @player_velocity = [0.0, 0.0, 0.0]
     @camera_position = [-1.5, 1.0, -1.5]
@@ -174,8 +136,8 @@ class MazeGame
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 40.0
-    @maze_draw_distance = 10
+    @fovy = 60.0
+    @maze_draw_distance = 4
 
     @cool_down = [99, 99]
 
@@ -183,12 +145,17 @@ class MazeGame
     @time_since_last_input = [99, 99]
 
     dice_roll_draw_buffer
+
+    @maze_level = maze_level
+    @players = {}
   end
 
-  def load_maze(s, e, b)
-    @maze_s = s
-    @maze_exit = e
-    @maze = b
+  def load_maze(l, s, e, b)
+    if @maze_level == l
+      @maze_s = s
+      @maze_exit = e
+      @maze = b
+    end
   end
 
   def dice_roll_draw_buffer
@@ -198,7 +165,7 @@ class MazeGame
     }
   end
 
-  def update_and_draw_threed(gl, global_time, delta_time, positions)
+  def update_and_draw_threed(gl, global_time, delta_time)
     return unless @maze
 
     px = py = nx = ny = 0
@@ -235,10 +202,7 @@ class MazeGame
     if @time_since_last_hop > hop_timeout
       @time_since_last_hop = 0
       dice_roll_draw_buffer
-      gl.emit({"position" => {$HEX => @player_position}})
-    #  @player_velocity[1] = hop_speed
-    #  did_hop = true
-    #  speed = speed * 15.0
+      gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity]}})
     end 
 
     this_direction = 2.33
@@ -532,7 +496,7 @@ class MazeGame
 
       #@camera_target[0] -= 0.5 * delta_time * ((@camera_target[0] - px) - ((px) - @cpx)) - (0.9 * delta_time * @player_velocity[0])
       #@camera_position[0] = -1 + px
-      @camera_position[1] = 20.25
+      @camera_position[1] = 2.25
       #@camera_position[2] = -1 + py
       #@camera_target[2] -= 0.5 * delta_time * ((@camera_target[2] - py + 1.5)- ((py) - @cpy)) - (0.9 * delta_time * @player_velocity[2])
 
@@ -599,24 +563,42 @@ class MazeGame
     @cube.deltap(*@player_position)
     @cube.draw(false)
     
-    positions.each { |key, rpp|
-      @cube.deltap(*rpp)
+    @players.each { |key, rpv|
+      player_position, player_velocity = *rpv
+
+      @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
+
+      player_position[0] += (player_velocity[0] * delta_time * 0.5)
+      player_position[2] += (player_velocity[2] * delta_time * 0.5)
+
+      @cube.deltap(*player_position)
       @cube.draw(false)
     }
 
     :keep_running
+  end
+
+  def track_other_players!(msg)
+    player_updated = msg.keys
+    player_updated.each { |player|
+      maze_level, player_position, player_velocity = msg[player]
+
+      if @maze_level == maze_level
+        @players.merge!({player => [player_position, player_velocity]})
+      end
+    }
   end
 end
 
 Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
-    #gl.open_default_view! 0
 
     @start_game_proc = Proc.new {
       @maze_level ||= 0
       @maze_level += 1
       @maze_game = MazeGame.new(@maze_level)
+      gl.emit({"mkmaze" => @maze_level})
     }
 
     @start_game_proc.call
@@ -628,14 +610,12 @@ Wkndr.server_side { |gl, server|
   end
 }
 
-@positions = {}
-
 Wkndr.client_side { |gl|
   gl.event { |channel, msg|
     case channel
       when "position"
         #@spawn_proc.call(*msg) if (@spawn_proc && @store)
-        @positions.merge!(msg)
+        @maze_game.track_other_players!(msg)
 
       when "maze"
         @maze_game.load_maze(*msg)
@@ -645,7 +625,7 @@ Wkndr.client_side { |gl|
   gl.update { |global_time, delta_time|
     gl.drawmode {
       gl.threed {
-        case @maze_game.update_and_draw_threed(gl, global_time, delta_time, @positions)
+        case @maze_game.update_and_draw_threed(gl, global_time, delta_time)
           when :restart
             @start_game_proc.call
         end
