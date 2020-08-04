@@ -150,9 +150,6 @@ class MazeGame
     @players.each { |key, rpv|
       player_position, player_velocity = *rpv
 
-      player_position[0] += (player_velocity[0] * delta_time * 1.0)
-      player_position[2] += (player_velocity[2] * delta_time * 1.0)
-
       @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
       @cube.deltap(*player_position)
       @cube.draw(false)
@@ -435,6 +432,13 @@ class MazeGame
 
     @px = px
     @py = py
+
+    @players.each { |key, rpv|
+      player_position, player_velocity = *rpv
+
+      player_position[0] += (player_velocity[0] * delta_time * 0.33)
+      player_position[2] += (player_velocity[2] * delta_time * 0.33)
+    }
 
     :keep_running
   end
