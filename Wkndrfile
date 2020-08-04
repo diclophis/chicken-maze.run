@@ -186,7 +186,7 @@ class MazeGame
     max_v = 1.0
     rfx = 1.0
     rfy = 1.0
-    hop_timeout = 0.125
+    hop_timeout = 0.333
     did_hop = false
 
     if @time_since_last_hop > hop_timeout
