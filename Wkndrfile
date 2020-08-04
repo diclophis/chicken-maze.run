@@ -124,7 +124,6 @@ class MazeGame
 
   def draw(gl)
     return unless @maze && @px && @py
-    #return unless @ticks > 3
 
     gl.lookat(1, *@camera_position, *@camera_target, @fovy)
 
@@ -187,7 +186,7 @@ class MazeGame
     max_v = 1.0
     rfx = 1.0
     rfy = 1.0
-    hop_timeout = 0.25
+    hop_timeout = 0.125
     did_hop = false
 
     if @time_since_last_hop > hop_timeout
@@ -436,8 +435,6 @@ class MazeGame
 
     @px = px
     @py = py
-
-    @ticks += 1
 
     :keep_running
   end
