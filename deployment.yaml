@@ -34,7 +34,7 @@ spec:
       - name: mkmaze
         image: chicken-maze.run:latest
         imagePullPolicy: IfNotPresent
-        command: ["/var/lib/wkndr/release/wkndr.mruby", "--no-server", "--party=/var/lib/wkndr/doc/Wkndrfile"]
+        command: ["/var/lib/wkndr/release/wkndr.mruby", "--no-server", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
         resources:
           limits:
             memory: 1024M

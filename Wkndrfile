@@ -36,12 +36,14 @@ class MazeGame
     end
   end
 
-  def initialize(maze_level, shapes, shape_translate_table)
+  def level
+    @maze_level
+  end
+
+  def initialize(maze_level, cube, shapes, shape_translate_table)
     @shapes = shapes
     @shape_translate_table = shape_translate_table
-
-    chicken_file = "resources/chicken.glb"
-    @cube = Model.new(chicken_file, "", 0.125)
+    @cube = cube
 
     @cpx = -1
     @cpy = -1
@@ -54,7 +56,7 @@ class MazeGame
 
     @player_position = [0.0,@floor_position-0.025,0.0]
     @player_velocity = [0.0, 0.0, 0.0]
-    @camera_position = [-1.5, 1.0, -1.5]
+    @camera_position = [0.0, 0.0, 0.0]
     @camera_target = [0.0, 0.0, 0.0]
 
     @top_left_min = [1.1, 1.1]
@@ -89,8 +91,8 @@ class MazeGame
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 50.0
-    @maze_draw_distance = 3
+    @fovy = 60.0
+    @maze_draw_distance = 4
 
     @cool_down = [99, 99]
 
@@ -101,6 +103,8 @@ class MazeGame
 
     @maze_level = maze_level
     @players = {}
+
+    @ticks = 0
   end
 
   def load_maze!(l, s, e, b)
@@ -118,7 +122,45 @@ class MazeGame
     }
   end
 
-  def update_and_draw_threed(gl, global_time, delta_time)
+  def draw(gl)
+    return unless @maze && @px && @py
+    #return unless @ticks > 3
+
+    gl.lookat(1, *@camera_position, *@camera_target, @fovy)
+
+    ((@px-@maze_draw_distance)..(@px+@maze_draw_distance)).each do |x|
+      ((@py-@maze_draw_distance)..(@py+@maze_draw_distance)).each do |y|
+        if x>=0 && x<@maze_s && y>=0 && y<@maze_s
+          cell = @maze[x][y]
+          unless cell == 0
+            primary = (cell & PRIMARY)
+
+            if shape = @shapes[primary]
+              shape.deltap(x, 0, y)
+              shape.draw(false)
+            end
+          end
+        end
+      end
+    end
+
+    @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
+    @cube.deltap(*@player_position)
+    @cube.draw(false)
+    
+    @players.each { |key, rpv|
+      player_position, player_velocity = *rpv
+
+      player_position[0] += (player_velocity[0] * delta_time * 1.0)
+      player_position[2] += (player_velocity[2] * delta_time * 1.0)
+
+      @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
+      @cube.deltap(*player_position)
+      @cube.draw(false)
+    }
+  end
+
+  def update(gl, global_time, delta_time)
     return unless @maze
 
     px = py = nx = ny = 0
@@ -292,7 +334,13 @@ class MazeGame
       @at_exit_time += delta_time
 
       if @at_exit_time > 0.0
-        return :restart
+        return :level_up
+      end
+    elsif [-1, 0] == [px, py]
+      @at_exit_time += delta_time
+
+      if @at_exit_time > 0.0
+        return :level_down
       end
     else
       @at_exit_time = 0.0
@@ -347,6 +395,16 @@ class MazeGame
 
     @time_since_last_hop += delta_time
 
+    follow_speed = 0.20
+
+    if @cool_down[0] < 0.33 
+      follow_speed *= (1.0 - @cool_down[0])
+    end
+
+    if @cool_down[1] < 0.33
+      follow_speed *= (1.0 - @cool_down[1])
+    end
+
     if !got_lr || bounced
       @player_velocity[0] *= 1.0 - (friction * delta_time)
       intended_forces[0] = 0.0
@@ -360,58 +418,26 @@ class MazeGame
     @player_velocity[0] += intended_forces[0] * delta_time
     @player_velocity[2] += intended_forces[1] * delta_time
 
-    unless skip_camera_update
-      @camera_position[1] = 2.0
+    @camera_position[1] = 1.75
 
-      @camera_target[0] -= (@camera_target[0] - (@player_position[0] + (0.25 * @player_velocity[0]))) * (delta_time * 1.0)
-      @camera_target[2] -= (@camera_target[2] - (@player_position[2] + (0.25 * @player_velocity[2]))) * (delta_time * 1.0)
+    @camera_target[0] -= (@camera_target[0] - (@player_position[0] + (follow_speed * @player_velocity[0]))) * (delta_time * 1.0)
+    @camera_target[2] -= (@camera_target[2] - (@player_position[2] + (follow_speed * @player_velocity[2]))) * (delta_time * 1.0)
 
-      @camera_position[0] = @camera_target[0]
-      @camera_position[2] = @camera_target[2] - 1.5
+    @camera_position[0] += (@camera_target[0] - @camera_position[0]) * delta_time  * follow_speed * 10.0
+    @camera_position[2] += (((@camera_target[2] - 1.25) - @camera_position[2]) * delta_time  * follow_speed * 10.0)
 
-      if px != @cpx
-        @cpx = px
-      end
-
-      if py != @cpy
-        @cpy = py
-      end
-
-      gl.lookat(1, *@camera_position, *@camera_target, @fovy)
+    if px != @cpx
+      @cpx = px
     end
 
-    dbi = 0
-
-    ((px-@maze_draw_distance)..(px+@maze_draw_distance)).each do |x|
-      ((py-@maze_draw_distance)..(py+@maze_draw_distance)).each do |y|
-        if x>=0 && x<@maze_s && y>=0 && y<@maze_s
-          cell = @maze[x][y]
-          unless cell == 0
-            primary = (cell & PRIMARY)
-
-            if shape = @shapes[primary]
-              shape.deltap(x, 0, y)
-              shape.draw(false)
-            end
-          end
-        end
-      end
+    if py != @cpy
+      @cpy = py
     end
 
-    @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
-    @cube.deltap(*@player_position)
-    @cube.draw(false)
-    
-    @players.each { |key, rpv|
-      player_position, player_velocity = *rpv
+    @px = px
+    @py = py
 
-      player_position[0] += (player_velocity[0] * delta_time * 1.0)
-      player_position[2] += (player_velocity[2] * delta_time * 1.0)
-
-      @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
-      @cube.deltap(*player_position)
-      @cube.draw(false)
-    }
+    @ticks += 1
 
     :keep_running
   end
@@ -431,6 +457,9 @@ end
 Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
+
+    chicken_file = "resources/chicken.glb"
+    cube = Model.new(chicken_file, "", 0.125)
 
     shapes = {}
     shape_translate_table = {}
@@ -480,15 +509,16 @@ Wkndr.nonce {
       end
     }
 
+    @start_game_proc = Proc.new { |maze_level|
+      if maze_level < 1
+        maze_level = 1
+      end
 
-    @start_game_proc = Proc.new {
-      @maze_level ||= 0
-      @maze_level += 1
-      @maze_game = MazeGame.new(@maze_level, shapes, shape_translate_table)
-      gl.emit({"mkmaze" => @maze_level})
+      @maze_game = MazeGame.new(maze_level, cube, shapes, shape_translate_table)
+      gl.emit({"mkmaze" => maze_level})
     }
 
-    @start_game_proc.call
+    @start_game_proc.call(1)
   }
 }
 
@@ -509,12 +539,18 @@ Wkndr.client_side { |gl|
   }
 
   gl.update { |global_time, delta_time|
+    case @maze_game.update(gl, global_time, delta_time)
+      when :level_up
+        @start_game_proc.call(@maze_game.level + 1)
+
+      when :level_down
+        @start_game_proc.call(@maze_game.level - 1)
+
+    end
+
     gl.drawmode {
       gl.threed {
-        case @maze_game.update_and_draw_threed(gl, global_time, delta_time)
-          when :restart
-            @start_game_proc.call
-        end
+        @maze_game.draw(gl)
       }
     }
   }
