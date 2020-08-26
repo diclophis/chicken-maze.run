@@ -528,6 +528,8 @@ Wkndr.server_side { |gl, server|
   end
 }
 
+draw = true
+
 Wkndr.client_side { |gl|
   gl.event { |channel, msg|
     case channel
@@ -549,10 +551,16 @@ Wkndr.client_side { |gl|
 
     end
 
-    gl.drawmode {
-      gl.threed {
-        @maze_game.draw(gl)
+    if draw
+      draw = false
+      gl.drawmode {
+        gl.threed {
+          @maze_game.draw(gl)
+        }
       }
-    }
+    else
+      draw = true
+    end
+
   }
 }
