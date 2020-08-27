@@ -146,6 +146,9 @@ class GameEngine
     @shape_translate_table = shape_translate_table
     @cube = cube
 
+    @px = 0
+    @py = 0
+
     @cpx = -1
     @cpy = -1
 
@@ -157,7 +160,7 @@ class GameEngine
 
     @player_position = [0.0,@floor_position-0.025,0.0]
     @player_velocity = [0.0, 0.0, 0.0]
-    @camera_position = [0.0, 0.0, 0.0]
+    @camera_position = [1.0, 1.0, 2.0]
     @camera_target = [0.0, 0.0, 0.0]
 
     @top_left_min = [1.1, 1.1]
@@ -216,7 +219,11 @@ class GameEngine
   end
 
   def self.draw_threed(gl)
-    @game.draw(gl)
+    @game.draw_threed(gl)
+  end
+
+  def self.draw_twod(gl)
+    @game.draw_twod(gl)
   end
 
   def self.start(gl, cube, shapes, shape_translate_table, starting_level = 1)
@@ -231,45 +238,12 @@ class GameEngine
     if @game
       case channel
         when "position"
+          raise "wtf"
           @game.track_other_players!(msg)
         when "maze"
           @game.load_maze!(*msg)
       end
     end
-  end
-
-  def draw(gl)
-    return unless @maze && @px && @py
-
-    gl.lookat(1, *@camera_position, *@camera_target, @fovy)
-
-    ((@px-@maze_draw_distance)..(@px+@maze_draw_distance)).each do |x|
-      ((@py-@maze_draw_distance)..(@py+@maze_draw_distance)).each do |y|
-        if x>=0 && x<@maze_s && y>=0 && y<@maze_s
-          cell = @maze[x][y]
-          unless cell == 0
-            primary = (cell & PRIMARY)
-
-            if shape = @shapes[primary]
-              shape.deltap(x, 0, y)
-              shape.draw(false)
-            end
-          end
-        end
-      end
-    end
-
-    @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
-    @cube.deltap(*@player_position)
-    @cube.draw(false)
-    
-    @players.each { |key, rpv|
-      player_position, player_velocity = *rpv
-
-      @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
-      @cube.deltap(*player_position)
-      @cube.draw(false)
-    }
   end
 
   def level
@@ -285,6 +259,10 @@ class GameEngine
   end
 
   def update(gl, global_time, delta_time)
+    @last_delta_time = delta_time
+    @last_global_time = global_time
+    @ticks += 1
+
     return unless @maze
 
     px = py = nx = ny = 0
@@ -316,8 +294,7 @@ class GameEngine
 
     if @time_since_last_hop > hop_timeout
       @time_since_last_hop = 0
-      #dice_roll_draw_buffer
-      gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity]}})
+      #gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity]}})
     end 
 
     this_direction = 2.33
@@ -357,12 +334,27 @@ class GameEngine
       @player_velocity[2] = -max_v
     end
 
+    #if @player_velocity[2] > 0 && @player_velocity[2] < 0.00005
+    #  @player_velocity[2] = 0
+    #end
+
+    #if @player_velocity[0] > 0 && @player_velocity[0] < 0.00005
+    #  @player_velocity[0] = 0
+    #end
+
+    #if @player_velocity[0] < 0 && @player_velocity[0] > -0.00005
+    #  @player_velocity[0] = 0
+    #end
+
+    #if @player_velocity[2] < 0 && @player_velocity[2] > -0.00005
+    #  @player_velocity[2] = 0
+    #end
 
     nx = @player_position[0] + (@player_velocity[0] * delta_time)
     ny = @player_position[2] + (@player_velocity[2] * delta_time)
 
-    px = ((nx - 0).round)
-    py = ((ny - 0).round)
+    px = nx.round
+    py = ny.round
 
     if px >= 0 && px < @maze_s && py >= 0 && py < @maze_s
       player_at_shape_cell = @maze[px.to_i][py.to_i]
@@ -529,18 +521,21 @@ class GameEngine
       follow_speed *= (1.0 - @cool_down[1])
     end
 
+    avx = intended_forces[0] # * delta_time
+    avy = intended_forces[1] # * delta_time
+
     if !got_lr || bounced
-      @player_velocity[0] *= 1.0 - (friction * delta_time)
+      #@player_velocity[0] *= 1.0 - (friction * delta_time)
       intended_forces[0] = 0.0
     end
 
     if !got_ud || bounced
-      @player_velocity[2] *= 1.0 - (friction * delta_time)
+      #@player_velocity[2] *= 1.0 - (friction * delta_time)
       intended_forces[1] = 0.0
     end
 
-    @player_velocity[0] += intended_forces[0] * delta_time
-    @player_velocity[2] += intended_forces[1] * delta_time
+    @player_velocity[0] += avx #intended_forces[0] * delta_time
+    @player_velocity[2] += avy #intended_forces[1] * delta_time
 
     @camera_position[1] = 1.75
 
@@ -567,8 +562,50 @@ class GameEngine
       player_position[0] += (player_velocity[0] * delta_time * 0.33)
       player_position[2] += (player_velocity[2] * delta_time * 0.33)
     }
-
+    
     :keep_running
+  end
+
+  def draw_threed(gl)
+    return unless @maze && @px && @py
+
+    #raise [*@camera_position, *@camera_target, @fovy].inspect
+
+    gl.lookat(1, *@camera_position, *@camera_target, @fovy)
+
+    ((@px-@maze_draw_distance)..(@px+@maze_draw_distance)).each do |x|
+      ((@py-@maze_draw_distance)..(@py+@maze_draw_distance)).each do |y|
+        if x>=0 && x<@maze_s && y>=0 && y<@maze_s
+          cell = @maze[x][y]
+          unless cell == 0
+            primary = (cell & PRIMARY)
+
+            if shape = @shapes[primary]
+              shape.deltap(x, 0, y)
+              shape.draw(false)
+            end
+          end
+        end
+      end
+    end
+
+    @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
+    @cube.deltap(*@player_position)
+    @cube.draw(false)
+    
+    @players.each { |key, rpv|
+      player_position, player_velocity = *rpv
+
+      @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
+      @cube.deltap(*player_position)
+      @cube.draw(false)
+    }
+  end
+
+  def draw_twod(gl)
+    #if @last_delta_time
+      gl.label(@ticks.to_s + " | " + ("%04.4f" % (@player_velocity[0] || 0.0)) + " | " + ("%06.2f" % ((@last_delta_time || 0.0) * 1000.0)) + " | " + ("%06.2f" % (@last_global_time || 0.0)))
+    #end
   end
 
   #TODO: abstract this
@@ -677,16 +714,20 @@ Wkndr.client_side { |gl|
 
   gl.update { |global_time, delta_time|
     GameEngine.process_time(gl, global_time, delta_time)
+    #gl.emit({"ping" => global_time})
 
-    if draw
-      draw = false
+    #if draw
+    #  draw = false
       gl.drawmode {
         gl.threed {
           GameEngine.draw_threed(gl)
         }
+        gl.twod {
+          GameEngine.draw_twod(gl)
+        }
       }
-    else
-      draw = true
-    end
+    #else
+    #  draw = true
+    #end
   }
 }
