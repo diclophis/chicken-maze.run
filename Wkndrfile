@@ -8,8 +8,8 @@ class GameCamera
   end
 
   def lookat(gl, player_position)
-    follow_speed = 0.025
-    follow_look_speed = 0.25
+    follow_speed = 0.0125
+    follow_look_speed = 0.125
 
     @camera_target[0] += (player_position[0] - @camera_target[0]) * (1.0 * (player_position[0] - @camera_target[0]).abs) * follow_look_speed
     @camera_target[2] += (player_position[2] - @camera_target[2]) * (1.0 * (player_position[2] - @camera_target[2]).abs) * follow_look_speed
