@@ -7,16 +7,18 @@ class GameCamera
     @camera_position[1] = 2.0
   end
 
+  def update(gl, global_time, delta_time, player_position)
+    follow_speed = 0.75
+    follow_look_speed = 5.0
+
+    @camera_target[0] += (player_position[0] - @camera_target[0]) * (1.0 * (player_position[0] - @camera_target[0]).abs) * follow_look_speed * delta_time
+    @camera_target[2] += (player_position[2] - @camera_target[2]) * (1.0 * (player_position[2] - @camera_target[2]).abs) * follow_look_speed * delta_time
+
+    @camera_position[0] += ((@camera_target[0] - @camera_position[0]) * follow_speed * delta_time)
+    @camera_position[2] += (((@camera_target[2] - 2.25) - @camera_position[2]) * follow_speed * delta_time)
+  end
+
   def lookat(gl, player_position)
-    follow_speed = 0.0125
-    follow_look_speed = 0.125
-
-    @camera_target[0] += (player_position[0] - @camera_target[0]) * (1.0 * (player_position[0] - @camera_target[0]).abs) * follow_look_speed
-    @camera_target[2] += (player_position[2] - @camera_target[2]) * (1.0 * (player_position[2] - @camera_target[2]).abs) * follow_look_speed
-
-    @camera_position[0] += ((@camera_target[0] - @camera_position[0]) * follow_speed)
-    @camera_position[2] += (((@camera_target[2] - 2.25) - @camera_position[2]) * follow_speed)
-
     gl.lookat(1, *@camera_position, *@camera_target, 40.0)
   end
 end
@@ -90,7 +92,7 @@ class GameEngine
     @lin_y2 = 0.0
 
     @fovy = 40.0
-    @maze_draw_distance = 7
+    @maze_draw_distance = 10
 
     @cool_down = [99, 99]
 
@@ -108,6 +110,8 @@ class GameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
+    @camera.update(gl, global_time, delta_time, @game.player_position)
+
     case @game.update(gl, global_time, delta_time)
       when :level_up
         @start_game_proc.call(@game.level + 1, :level_up)
@@ -187,10 +191,9 @@ class GameEngine
     speed = 0.1
     friction = speed * 1.1
     max_v = 1.0
-    rfx = 0.99
-    rfy = 0.99
-    hop_timeout = 0.333
-    did_hop = false
+    rfx = 1.01
+    rfy = 1.01
+    hop_timeout = 0.5
 
     this_direction = speed
 
@@ -333,7 +336,6 @@ class GameEngine
         line = nil
 
         if bounced == :y
-          #@cool_down[0] = 0.0
           line = [@lne_x1, @lne_y1, @lne_x2, @lne_y2]
         end
 
