@@ -14,16 +14,6 @@ PRIMARY  = 0x000000FF
 #
 #
 #
-#  def track_other_players!(msg)
-#    player_updated = msg.keys
-#    player_updated.each { |player|
-#      maze_level, player_position, player_velocity = msg[player]
-#
-#      if @maze_level == maze_level
-#        @players.merge!({player => [player_position, player_velocity]})
-#      end
-#    }
-#  end
 #end
 
 #Wkndr.nonce {
@@ -238,7 +228,6 @@ class GameEngine
     if @game
       case channel
         when "position"
-          raise "wtf"
           @game.track_other_players!(msg)
         when "maze"
           @game.load_maze!(*msg)
@@ -295,13 +284,8 @@ class GameEngine
     max_v = 1.0
     rfx = 0.99
     rfy = 0.99
-    hop_timeout = 1.0
+    hop_timeout = 0.333
     did_hop = false
-
-    if @time_since_last_hop > hop_timeout
-      @time_since_last_hop = 0
-      gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity]}})
-    end 
 
     this_direction = speed
 
@@ -573,10 +557,18 @@ class GameEngine
     @players.each { |key, rpv|
       player_position, player_velocity = *rpv
 
-      player_position[0] += (player_velocity[0] * delta_time * 0.33)
-      player_position[2] += (player_velocity[2] * delta_time * 0.33)
+      player_velocity[0] += (player_velocity[0] * -1.0) * friction
+      player_velocity[2] += (player_velocity[2] * -1.0) * friction
+
+      player_position[0] += (player_velocity[0] * delta_time)
+      player_position[2] += (player_velocity[2] * delta_time)
     }
-    
+
+    if @time_since_last_hop > hop_timeout
+      @time_since_last_hop = 0
+      gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity]}})
+    end 
+
     :keep_running
   end
 
@@ -620,6 +612,17 @@ class GameEngine
     #if @last_delta_time
       gl.label(@ticks.to_s + " | " + ("%04.4f" % (@player_velocity[0] || 0.0)) + " | " + ("%06.2f" % ((@last_delta_time || 0.0) * 1000.0)) + " | " + ("%06.2f" % (@last_global_time || 0.0)))
     #end
+  end
+
+  def track_other_players!(msg)
+    player_updated = msg.keys
+    player_updated.each { |player|
+      maze_level, player_position, player_velocity = msg[player]
+
+      if @maze_level == maze_level
+        @players.merge!({player => [player_position, player_velocity]})
+      end
+    }
   end
 
   #TODO: abstract this
