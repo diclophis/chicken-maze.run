@@ -160,7 +160,7 @@ class GameEngine
 
     @player_position = [0.0,@floor_position-0.025,0.0]
     @player_velocity = [0.0, 0.0, 0.0]
-    @camera_position = [1.0, 1.0, 2.0]
+    @camera_position = [1.0, 1.0, -2.0]
     @camera_target = [0.0, 0.0, 0.0]
 
     @top_left_min = [1.1, 1.1]
@@ -195,8 +195,8 @@ class GameEngine
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 60.0
-    @maze_draw_distance = 4
+    @fovy = 40.0
+    @maze_draw_distance = 7
 
     @cool_down = [99, 99]
 
@@ -212,9 +212,9 @@ class GameEngine
   def self.process_time(gl, global_time, delta_time)
     case @game.update(gl, global_time, delta_time)
       when :level_up
-    #    @start_game_proc.call(@maze_game.level + 1)
+        @start_game_proc.call(@game.level + 1)
       when :level_down
-    #    @start_game_proc.call(@maze_game.level - 1)
+        @start_game_proc.call(@game.level - 1)
     end
   end
 
@@ -229,7 +229,7 @@ class GameEngine
   def self.start(gl, cube, shapes, shape_translate_table, starting_level = 1)
     @start_game_proc ||= Proc.new { |maze_level|
       @game = self.new(maze_level, cube, shapes, shape_translate_table)
-      gl.emit({"mkmaze" => maze_level})
+      gl.emit({"mkmaze" => @game.level})
     }
     @start_game_proc.call(starting_level)
   end
@@ -259,6 +259,10 @@ class GameEngine
   end
 
   def update(gl, global_time, delta_time)
+    #delta_time = delta_time * 0.1
+    #opx = @player_position[0] + (@player_velocity[0] * 1.5 * delta_time)
+    #opy = @player_position[2] + (@player_velocity[2] * 1.5 * delta_time)
+
     @last_delta_time = delta_time
     @last_global_time = global_time
     @ticks += 1
@@ -284,20 +288,22 @@ class GameEngine
     allow_right = false
 
     arrow_keys = gl.keyspressed(KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN)
-    speed = 0.0345
-    friction = 5.67
+    speed = 0.1
+    friction = speed * 1.1
+    follow_look_speed = 0.125
+    follow_speed = 1.5
     max_v = 1.0
-    rfx = 1.0
-    rfy = 1.0
-    hop_timeout = 0.333
+    rfx = 0.99
+    rfy = 0.99
+    hop_timeout = 1.0
     did_hop = false
 
     if @time_since_last_hop > hop_timeout
       @time_since_last_hop = 0
-      #gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity]}})
+      gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity]}})
     end 
 
-    this_direction = 2.33
+    this_direction = speed
 
     intended_forces = [0, 0]
 
@@ -317,38 +323,6 @@ class GameEngine
           intended_forces[0] = -this_direction
       end
     end
-
-    if @player_velocity[2] > max_v
-      @player_velocity[2] = max_v
-    end
-
-    if @player_velocity[0] > max_v
-      @player_velocity[0] = max_v
-    end
-
-    if @player_velocity[0] < -max_v
-      @player_velocity[0] = -max_v
-    end
-
-    if @player_velocity[2] < -max_v
-      @player_velocity[2] = -max_v
-    end
-
-    #if @player_velocity[2] > 0 && @player_velocity[2] < 0.00005
-    #  @player_velocity[2] = 0
-    #end
-
-    #if @player_velocity[0] > 0 && @player_velocity[0] < 0.00005
-    #  @player_velocity[0] = 0
-    #end
-
-    #if @player_velocity[0] < 0 && @player_velocity[0] > -0.00005
-    #  @player_velocity[0] = 0
-    #end
-
-    #if @player_velocity[2] < 0 && @player_velocity[2] > -0.00005
-    #  @player_velocity[2] = 0
-    #end
 
     nx = @player_position[0] + (@player_velocity[0] * delta_time)
     ny = @player_position[2] + (@player_velocity[2] * delta_time)
@@ -473,12 +447,12 @@ class GameEngine
         line = nil
 
         if bounced == :y
-          @cool_down[0] = 0.0
+          #@cool_down[0] = 0.0
           line = [@lne_x1, @lne_y1, @lne_x2, @lne_y2]
         end
 
         if bounced == :x
-          @cool_down[1] = 0.0
+          #@cool_down[1] = 0.0
           line = [@lin_x1, @lin_y1, @lin_x2, @lin_y2]
         end
 
@@ -501,8 +475,8 @@ class GameEngine
         @player_velocity[0] = (reflectedRayTipX * rfx)
         @player_velocity[2] = (reflectedRayTipY * rfy)
       else
-        @cool_down[0] += delta_time
-        @cool_down[1] += delta_time
+        #@cool_down[0] += delta_time
+        #@cool_down[1] += delta_time
 
         @player_position[0] = nx
         @player_position[2] = ny
@@ -511,39 +485,79 @@ class GameEngine
 
     @time_since_last_hop += delta_time
 
-    follow_speed = 0.20
+    #if @cool_down[0] < 1.0
+    #  follow_speed *= (1.0 - @cool_down[0])
+    #end
 
-    if @cool_down[0] < 0.33 
-      follow_speed *= (1.0 - @cool_down[0])
-    end
-
-    if @cool_down[1] < 0.33
-      follow_speed *= (1.0 - @cool_down[1])
-    end
+    #if @cool_down[1] < 1.0
+    #  follow_speed *= (1.0 - @cool_down[1])
+    #end
 
     avx = intended_forces[0] # * delta_time
     avy = intended_forces[1] # * delta_time
 
-    if !got_lr || bounced
+    if !got_lr # || bounced
       #@player_velocity[0] *= 1.0 - (friction * delta_time)
-      intended_forces[0] = 0.0
+      avx += (@player_velocity[0] * -1.0) * friction
+      #intended_forces[0] = 0.0
     end
 
-    if !got_ud || bounced
+    if !got_ud # || bounced
       #@player_velocity[2] *= 1.0 - (friction * delta_time)
-      intended_forces[1] = 0.0
+      avy += (@player_velocity[2] * -1.0) * friction
+      #intended_forces[1] = 0.0
     end
+
+    #if bounced
+    #  avx = 0
+    #  avy = 0
+    #end
 
     @player_velocity[0] += avx #intended_forces[0] * delta_time
     @player_velocity[2] += avy #intended_forces[1] * delta_time
 
-    @camera_position[1] = 1.75
+    if @player_velocity[2] > max_v
+      @player_velocity[2] = max_v
+    end
 
-    @camera_target[0] -= (@camera_target[0] - (@player_position[0] + (follow_speed * @player_velocity[0]))) * (delta_time * 1.0)
-    @camera_target[2] -= (@camera_target[2] - (@player_position[2] + (follow_speed * @player_velocity[2]))) * (delta_time * 1.0)
+    if @player_velocity[0] > max_v
+      @player_velocity[0] = max_v
+    end
 
-    @camera_position[0] += (@camera_target[0] - @camera_position[0]) * delta_time  * follow_speed * 10.0
-    @camera_position[2] += (((@camera_target[2] - 1.25) - @camera_position[2]) * delta_time  * follow_speed * 10.0)
+    if @player_velocity[0] < -max_v
+      @player_velocity[0] = -max_v
+    end
+
+    if @player_velocity[2] < -max_v
+      @player_velocity[2] = -max_v
+    end
+
+    #if @player_velocity[2] > 0 && @player_velocity[2] < 0.00005
+    #  @player_velocity[2] = 0
+    #end
+
+    #if @player_velocity[0] > 0 && @player_velocity[0] < 0.00005
+    #  @player_velocity[0] = 0
+    #end
+
+    #if @player_velocity[0] < 0 && @player_velocity[0] > -0.00005
+    #  @player_velocity[0] = 0
+    #end
+
+    #if @player_velocity[2] < 0 && @player_velocity[2] > -0.00005
+    #  @player_velocity[2] = 0
+    #end
+
+    @camera_position[1] = 1.25
+
+    @camera_target[0] += (@player_position[0] - @camera_target[0]) * (1.0 * (@player_position[0] - @camera_target[0]).abs) * follow_look_speed
+    @camera_target[2] += (@player_position[2] - @camera_target[2]) * (1.0 * (@player_position[2] - @camera_target[2]).abs) * follow_look_speed
+
+    #@camera_target[0] = opx
+    #@camera_target[2] = opy
+
+    @camera_position[0] += ((@camera_target[0] - @camera_position[0]) * delta_time  * follow_speed)
+    @camera_position[2] += (((@camera_target[2] - 1.25) - @camera_position[2]) * delta_time  * follow_speed)
 
     if px != @cpx
       @cpx = px
@@ -714,20 +728,14 @@ Wkndr.client_side { |gl|
 
   gl.update { |global_time, delta_time|
     GameEngine.process_time(gl, global_time, delta_time)
-    #gl.emit({"ping" => global_time})
 
-    #if draw
-    #  draw = false
-      gl.drawmode {
-        gl.threed {
-          GameEngine.draw_threed(gl)
-        }
-        gl.twod {
-          GameEngine.draw_twod(gl)
-        }
+    gl.drawmode {
+      gl.threed {
+        GameEngine.draw_threed(gl)
       }
-    #else
-    #  draw = true
-    #end
+      gl.twod {
+        GameEngine.draw_twod(gl)
+      }
+    }
   }
 }
