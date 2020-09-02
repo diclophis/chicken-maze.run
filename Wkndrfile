@@ -19,11 +19,6 @@ class GameCamera
 
     gl.lookat(1, *@camera_position, *@camera_target, 40.0)
   end
-
-  #def jump(player_position)
-  #  #@camera_position[0] = 0.0 - (player_position[0] - @camera_position[0])
-  #  #@camera_position[2] = 0.0 - (player_position[2] - @camera_position[2])
-  #end
 end
 
 class GameEngine
@@ -132,12 +127,7 @@ class GameEngine
   end
 
   def self.start(gl, cube, shapes, shape_translate_table, starting_level = 1, direction = :level_up)
-
     @start_game_proc ||= Proc.new { |maze_level, direction_inner|
-      #if @game
-      #  @camera.jump(@game.player_position)
-      #end
-
       @camera = GameCamera.new
       @game = self.new(maze_level, cube, shapes, shape_translate_table, direction_inner)
       gl.emit({"mkmaze" => @game.level})
