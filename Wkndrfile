@@ -92,7 +92,7 @@ class GameEngine
     @lin_y2 = 0.0
 
     @fovy = 40.0
-    @maze_draw_distance = 10
+    @maze_draw_distance = 3
 
     @cool_down = [99, 99]
 
@@ -193,7 +193,7 @@ class GameEngine
     max_v = 1.0
     rfx = 1.01
     rfy = 1.01
-    hop_timeout = 0.5
+    hop_timeout = 1.0
 
     this_direction = speed
 
