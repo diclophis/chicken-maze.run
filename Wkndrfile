@@ -1,28 +1,5 @@
 # vi:syntax=ruby
 
-class GameCamera
-  def initialize
-    @camera_target = [0, 0, 0]
-    @camera_position = [-0.0, 0, -3.0]
-    @camera_position[1] = 2.0
-  end
-
-  def update(gl, global_time, delta_time, player_position)
-    follow_speed = 0.75
-    follow_look_speed = 5.0
-
-    @camera_target[0] += (player_position[0] - @camera_target[0]) * (1.0 * (player_position[0] - @camera_target[0]).abs) * follow_look_speed * delta_time
-    @camera_target[2] += (player_position[2] - @camera_target[2]) * (1.0 * (player_position[2] - @camera_target[2]).abs) * follow_look_speed * delta_time
-
-    @camera_position[0] += ((@camera_target[0] - @camera_position[0]) * follow_speed * delta_time)
-    @camera_position[2] += (((@camera_target[2] - 2.25) - @camera_position[2]) * follow_speed * delta_time)
-  end
-
-  def lookat(gl, player_position)
-    gl.lookat(1, *@camera_position, *@camera_target, 40.0)
-  end
-end
-
 class GameEngine
   PRIMARY  = 0x000000FF
 
@@ -103,6 +80,9 @@ class GameEngine
     @players = {}
 
     @ticks = 0
+
+    @player_min = [0, 0]
+    @player_max = [0, 0]
   end
 
   def player_position
@@ -158,9 +138,13 @@ class GameEngine
     if @maze_level == l
       @maze_s = s
       @maze_exit = e
+      @maze_entrance = [-1, 0]
+
       @maze = b
 
-      @player_position = [@maze_exit[0] - 0.75,@floor_position-0.025, @maze_exit[1]] if @start_at_exit
+      if @start_at_exit
+        @player_position = [@maze_exit[0] - 0.55,@floor_position-0.025, @maze_exit[1]]
+      end
     end
   end
 
@@ -178,7 +162,6 @@ class GameEngine
     player_at_shape = nil
     at_left_right_limit = nil
     at_up_down_limit = nil
-    player_min = player_max = [0, 0]
     allow_up = false
     allow_down = false
     allow_left = false
@@ -253,6 +236,7 @@ class GameEngine
         allow_down = allow_up = true
         #TODO
         #includes left right crossing bits
+        #TODO
       when 12 # IS REALLY left-right from maze
         allow_left = allow_right = true
       when 6
@@ -268,59 +252,54 @@ class GameEngine
     at_left_right_limit = ((nx - px))
     at_up_down_limit = ((ny - py))
 
-    player_min = [at_left_right_limit + 0.05, at_up_down_limit + 0.05]
-    player_max = [at_left_right_limit - 0.05, at_up_down_limit - 0.05]
+    @player_min[0] = at_left_right_limit + 0.05
+    @player_min[1] = at_up_down_limit + 0.05
+    @player_max[0] = at_left_right_limit - 0.05
+    @player_max[1] = at_up_down_limit - 0.05
 
     bounced = false
-    correction = 0
 
-    if ab = test_aabb(@top_left_min, @top_left_max, player_min, player_max)
-      bounced = ab[0]
-      correction = ab[1]
+    if ab = AABB.test(@top_left_min, @top_left_max, @player_min, @player_max)
+      bounced = ab
     end
 
-    if ab = test_aabb(@bottom_left_min, @bottom_left_max, player_min, player_max)
-      bounced = ab[0]
-      correction = ab[1]
+    if ab = AABB.test(@bottom_left_min, @bottom_left_max, @player_min, @player_max)
+      bounced = ab
     end
 
-    if ab = test_aabb(@bottom_right_min, @bottom_right_max, player_min, player_max)
-      bounced = ab[0]
-      correction = ab[1]
+    if ab = AABB.test(@bottom_right_min, @bottom_right_max, @player_min, @player_max)
+      bounced = ab
     end
 
-    if ab = test_aabb(@top_right_min, @top_right_max, player_min, player_max)
-      bounced = ab[0]
-      correction = ab[1]
+    if ab = AABB.test(@top_right_min, @top_right_max, @player_min, @player_max)
+      bounced = ab
     end
 
-    if !allow_left && ab = test_aabb(@no_left_min, @no_left_max, player_min, player_max)
-      bounced = ab[0]
-      correction = ab[1]
+    if !allow_left && ab = AABB.test(@no_left_min, @no_left_max, @player_min, @player_max)
+      bounced = ab
     end
 
-    if !allow_right && ab = test_aabb(@no_right_min, @no_right_max, player_min, player_max)
-      bounced = ab[0]
-      correction = ab[1]
+    if !allow_right && ab = AABB.test(@no_right_min, @no_right_max, @player_min, @player_max)
+      bounced = ab
     end
 
-    if !allow_up && ab = test_aabb(@no_up_min, @no_up_max, player_min, player_max)
-      bounced = ab[0]
-      correction = ab[1]
+    if !allow_up && ab = AABB.test(@no_up_min, @no_up_max, @player_min, @player_max)
+      bounced = ab
     end
 
-    if !allow_down && ab = test_aabb(@no_down_min, @no_down_max, player_min, player_max)
-      bounced = ab[0]
-      correction = ab[1]
+    if !allow_down && ab = AABB.test(@no_down_min, @no_down_max, @player_min, @player_max)
+      bounced = ab
     end
 
-    if @maze_exit == [px, py]
+    maze_current = [px, py]
+
+    if @maze_exit == maze_current
       @at_exit_time += delta_time
 
       if @at_exit_time > 0.0
         return :level_up
       end
-    elsif [-1, 0] == [px, py]
+    elsif @maze_entrance == maze_current
       @at_exit_time += delta_time
 
       if @at_exit_time > 0.0
@@ -335,17 +314,13 @@ class GameEngine
       @player_velocity[2] = -@player_velocity[2]
     else
       if bounced
-        line = nil
-
         if bounced == :y
-          line = [@lne_x1, @lne_y1, @lne_x2, @lne_y2]
+          line_x1, line_y1, line_x2, line_y2 = @lne_x1, @lne_y1, @lne_x2, @lne_y2
         end
 
         if bounced == :x
-          line = [@lin_x1, @lin_y1, @lin_x2, @lin_y2]
+          line_x1, line_y1, line_x2, line_y2 = @lin_x1, @lin_y1, @lin_x2, @lin_y2
         end
-
-        line_x1, line_y1, line_x2, line_y2 = line
 
         normalY = line_x2 - line_x1
         normalX = line_y1 - line_y2
@@ -459,18 +434,10 @@ class GameEngine
       @cube.deltap(*player_position)
       @cube.draw(false)
     }
-
-    #x = 0
-    #y = 0
-    #primary = @shaped
-    #if shape = @shapes[primary]
-    #  shape.deltap(x, 0, y)
-    #  shape.draw(false)
-    #end
   end
 
   def draw_twod(gl)
-    gl.label(@maze_level.to_s + " | " + @ticks.to_s + " | " + ("%04.1f" % (@player_velocity[0] || 0.0)) + " | " + ("%04.1f" % ((@last_delta_time || 0.0) * 1000.0)) + " | " + ("%04.1f" % (@last_global_time || 0.0)))
+    gl.label(@maze_level.to_s + " | " + @ticks.to_s + " | " + ("%04.1f" % ((@last_delta_time || 0.0) * 1000.0)) + " | " + ("%04.1f" % (@last_global_time || 0.0)))
   end
 
   def track_other_players!(msg)
@@ -482,40 +449,6 @@ class GameEngine
         @players.merge!({player => [player_position, player_velocity]})
       end
     }
-  end
-
-  #TODO: abstract this
-  def test_aabb(min_a, max_a, min_b, max_b)
-    d1x = -min_b[0] - -max_a[0]
-    d1y = -min_b[1] - -max_a[1]
-    d2x = -min_a[0] - -max_b[0]
-    d2y = -min_a[1] - -max_b[1]
-
-    if (d1x > 0.0 || d1y > 0.0)
-      return false
-    elsif (d2x > 0.0 || d2y > 0.0)
-      return false
-    else
-      a = (d2x - d1x).abs
-      b = (d2y - d1y).abs
-      if a > b
-        if d2x < d1x
-          b = 0.0
-        else
-          b = 0.0
-        end
-
-        return [:y, b]
-      else
-        if d2y < d1y
-          a = 0.0
-        else
-          a = 0.0
-        end
-
-        return [:x, a]
-      end
-    end
   end
 end
 
