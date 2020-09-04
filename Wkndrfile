@@ -1,4 +1,4 @@
-#
+# vi:syntax=ruby
 
 class GameCamera
   def initialize
@@ -26,13 +26,12 @@ end
 class GameEngine
   PRIMARY  = 0x000000FF
 
-  def initialize(maze_level, cube, shapes, shape_translate_table, direction)
+  def initialize(maze_level, cube, shapes, direction)
     if maze_level < 1
       maze_level = 1
     end
 
     @shapes = shapes
-    @shape_translate_table = shape_translate_table
     @cube = cube
 
     @px = 0
@@ -50,9 +49,9 @@ class GameEngine
     @player_position = [0.0,@floor_position-0.025,0.0]
 
     if direction == :level_down
-      if maze_level == 1
-        @player_position = [0.45,@floor_position-0.025,0.0]
-      end
+      #if maze_level == 1
+        @start_at_exit = true
+      #end
     elsif direction == :level_up
       @player_position = [-0.45,@floor_position-0.025,0.0]
     end
@@ -130,10 +129,10 @@ class GameEngine
     @game.draw_twod(gl)
   end
 
-  def self.start(gl, cube, shapes, shape_translate_table, starting_level = 1, direction = :level_up)
+  def self.start(gl, cube, shapes, starting_level = 1, direction = :level_up)
     @start_game_proc ||= Proc.new { |maze_level, direction_inner|
       @camera = GameCamera.new
-      @game = self.new(maze_level, cube, shapes, shape_translate_table, direction_inner)
+      @game = self.new(maze_level, cube, shapes, direction_inner)
       gl.emit({"mkmaze" => @game.level})
     }
     @start_game_proc.call(starting_level, direction)
@@ -159,6 +158,8 @@ class GameEngine
       @maze_s = s
       @maze_exit = e
       @maze = b
+
+      @player_position = [@maze_exit[0] - 0.75,@floor_position-0.025, @maze_exit[1]] if @start_at_exit
     end
   end
 
@@ -223,42 +224,41 @@ class GameEngine
     py = ny.round
 
     if px >= 0 && px < @maze_s && py >= 0 && py < @maze_s
-      player_at_shape_cell = @maze[px.to_i][py.to_i]
-      player_at_shape = @shape_translate_table[(player_at_shape_cell & PRIMARY)]
+      player_at_shape = (@maze[px.to_i][py.to_i] & PRIMARY)
     end
 
     case player_at_shape
-      when 0
+      when 15
         allow_up = allow_down = allow_left = allow_right = true
-      when 1
-        allow_down = allow_left = allow_right = true
-      when 2
-        allow_up = allow_left = allow_right = true
-      when 3
-        allow_up = allow_down = allow_left = true
-      when 4
-        allow_up = allow_down = allow_right = true
-      when 5
-        allow_right = true
-      when 6
-        allow_left = true
-      when 7
-        allow_up = true
       when 8
-        allow_down = true
+        allow_down = allow_left = allow_right = true
+      when 7
+        allow_up = allow_left = allow_right = true
       when 9
+        allow_up = allow_down = allow_left = true
+      when 6
+        allow_up = allow_down = allow_right = true
+      when 12
+        allow_right = true
+      when 11
+        allow_left = true
+      when 3
+        allow_up = true
+      when 5
+        allow_down = true
+      when 13
         allow_down = allow_up = true
         #TODO
         #includes left right crossing bits
-      when 10
-        allow_left = allow_right = true
-      when 11
-        allow_up = allow_left = true
-      when 12
-        allow_down = allow_left = true
-      when 13
-        allow_down = allow_right = true
       when 14
+        allow_left = allow_right = true
+      when 4
+        allow_up = allow_left = true
+      when 10
+        allow_down = allow_left = true
+      when 1
+        allow_down = allow_right = true
+      when 2
         allow_right = true
         allow_up = true
     end
@@ -517,54 +517,13 @@ Wkndr.nonce {
     cube = Model.new(chicken_file, "", 0.125)
 
     shapes = {}
-    shape_translate_table = {}
 
     16.times { |i|
-      ii = begin
-        case i
-          when 1
-            8
-          when 2
-            7
-          when 3
-            9
-          when 4
-            6
-          when 5
-            12
-          when 6
-            11
-          when 7
-            3
-          when 8
-            5
-          when 9
-            13
-          when 10
-            14
-          when 11
-            4
-          when 12
-            10
-          when 13
-            1
-          when 14
-            2
-          when 15
-            0
-        else
-          nil
-        end
-      end
-
-      if ii
-        shape_translate_table[i] = ii
-        shape_file = "resources/shape-#{ii}.glb"
-        shapes[i] = Model.new(shape_file, "", 1.0)
-      end
+      shape_file = "resources/shape-#{i}.glb"
+      shapes[i] = Model.new(shape_file, "", 1.0)
     }
 
-    GameEngine.start(gl, cube, shapes, shape_translate_table)
+    GameEngine.start(gl, cube, shapes)
   }
 }
 
