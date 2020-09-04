@@ -33,6 +33,7 @@ class GameEngine
 
     @shapes = shapes
     @cube = cube
+    @shaped = 0
 
     @px = 0
     @py = 0
@@ -168,6 +169,8 @@ class GameEngine
     @last_global_time = global_time
     @ticks += 1
 
+    @shaped = (global_time * 0.1).to_i % 15
+
     return unless @maze
 
     px = py = nx = ny = 0
@@ -228,39 +231,38 @@ class GameEngine
     end
 
     case player_at_shape
-      when 15
+      when 15 # 0
         allow_up = allow_down = allow_left = allow_right = true
-      when 8
-        allow_down = allow_left = allow_right = true
-      when 7
-        allow_up = allow_left = allow_right = true
-      when 9
-        allow_up = allow_down = allow_left = true
-      when 6
-        allow_up = allow_down = allow_right = true
-      when 12
-        allow_right = true
-      when 11
-        allow_left = true
-      when 3
-        allow_up = true
-      when 5
-        allow_down = true
       when 13
+        allow_down = allow_left = allow_right = true
+      when 14
+        allow_up = allow_left = allow_right = true
+      when 7
+        allow_up = allow_down = allow_left = true
+      when 11
+        allow_up = allow_down = allow_right = true
+      when 8
+        allow_right = true
+      when 4
+        allow_left = true
+      when 2
+        allow_up = true
+      when 1
+        allow_down = true
+      when 3
         allow_down = allow_up = true
         #TODO
         #includes left right crossing bits
-      when 14
+      when 12 # IS REALLY left-right from maze
         allow_left = allow_right = true
-      when 4
+      when 6
         allow_up = allow_left = true
-      when 10
+      when 5
         allow_down = allow_left = true
-      when 1
+      when 9
         allow_down = allow_right = true
-      when 2
-        allow_right = true
-        allow_up = true
+      when 10
+        allow_up = allow_right = true
     end
 
     at_left_right_limit = ((nx - px))
@@ -457,6 +459,14 @@ class GameEngine
       @cube.deltap(*player_position)
       @cube.draw(false)
     }
+
+    #x = 0
+    #y = 0
+    #primary = @shaped
+    #if shape = @shapes[primary]
+    #  shape.deltap(x, 0, y)
+    #  shape.draw(false)
+    #end
   end
 
   def draw_twod(gl)
