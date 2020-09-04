@@ -27,9 +27,7 @@ class GameEngine
     @player_position = [0.0,@floor_position-0.025,0.0]
 
     if direction == :level_down
-      #if maze_level == 1
-        @start_at_exit = true
-      #end
+      @start_at_exit = true
     elsif direction == :level_up
       @player_position = [-0.45,@floor_position-0.025,0.0]
     end
@@ -69,7 +67,8 @@ class GameEngine
     @lin_y2 = 0.0
 
     @fovy = 40.0
-    @maze_draw_distance = 3
+    @maze_draw_distance = 8
+    @maze_draw_distance_h = @maze_draw_distance / 2
 
     @cool_down = [99, 99]
 
@@ -90,7 +89,7 @@ class GameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
-    @camera.update(gl, global_time, delta_time, @game.player_position)
+    @camera.update(gl, global_time, delta_time, 10.75, @game.player_position)
 
     case @game.update(gl, global_time, delta_time)
       when :level_up
@@ -408,8 +407,8 @@ class GameEngine
   def draw_threed(gl)
     return unless @maze && @px && @py
 
-    ((@px-@maze_draw_distance)..(@px+@maze_draw_distance)).each do |x|
-      ((@py-@maze_draw_distance)..(@py+@maze_draw_distance)).each do |y|
+    ((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
+      ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
         if x>=0 && x<@maze_s && y>=0 && y<@maze_s
           cell = @maze[x][y]
           unless cell == 0
