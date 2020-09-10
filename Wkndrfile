@@ -66,8 +66,8 @@ class GameEngine
     @lin_x2 = 1.0
     @lin_y2 = 0.0
 
-    @fovy = 40.0
-    @maze_draw_distance = 8
+    @fovy = 33.0
+    @maze_draw_distance = 4
     @maze_draw_distance_h = @maze_draw_distance / 2
 
     @cool_down = [99, 99]
@@ -89,7 +89,7 @@ class GameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
-    @camera.update(gl, global_time, delta_time, 10.75, @game.player_position)
+    @camera.update(gl, global_time, delta_time, 1.75, @game.player_position)
 
     case @game.update(gl, global_time, delta_time)
       when :level_up
