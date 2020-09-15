@@ -20,8 +20,6 @@ class GameEngine
 
     @at_exit_time = 0.0
 
-    @enforce_bounds = true
-
     @floor_position = 0.125
 
     @player_position = [0.0,@floor_position-0.025,0.0]
@@ -31,6 +29,8 @@ class GameEngine
     elsif direction == :level_up
       @player_position = [-0.45,@floor_position-0.025,0.0]
     end
+
+    @pressing = false
 
     @player_velocity = [0.0, 0.0, 0.0]
 
@@ -67,7 +67,7 @@ class GameEngine
     @lin_y2 = 0.0
 
     @fovy = 33.0
-    @maze_draw_distance = 4
+    @maze_draw_distance = 2
     @maze_draw_distance_h = @maze_draw_distance / 2
 
     @cool_down = [99, 99]
@@ -79,6 +79,7 @@ class GameEngine
     @players = {}
 
     @ticks = 0
+    @sent = 0
 
     @player_min = [0, 0]
     @player_max = [0, 0]
@@ -89,7 +90,7 @@ class GameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
-    @camera.update(gl, global_time, delta_time, 1.75, @game.player_position)
+    @camera.update(gl, global_time, delta_time, 0.75, @game.player_position)
 
     case @game.update(gl, global_time, delta_time)
       when :level_up
@@ -343,8 +344,6 @@ class GameEngine
       end
     end
 
-    @time_since_last_hop += delta_time
-
     avx = intended_forces[0]
     avy = intended_forces[1]
 
@@ -356,12 +355,22 @@ class GameEngine
       avy += (@player_velocity[2] * -1.0) * friction
     end
 
+    old_pressing = @pressing
+
+    if (got_lr || got_ud) && !@pressing
+      @pressing = true
+    elsif !got_lr && !got_ud && @pressing
+      @pressing = false
+    end
+
+    if (old_pressing != @pressing) || bounced #(got_lr || got_ud || bounced) && (old_pressing != @pressing)
+      @time_since_last_hop = hop_timeout
+    end
+
+    @time_since_last_hop += delta_time
+
     @player_velocity[0] += avx
     @player_velocity[2] += avy
-
-    if @player_velocity[2] > max_v
-      @player_velocity[2] = max_v
-    end
 
     if @player_velocity[0] > max_v
       @player_velocity[0] = max_v
@@ -369,6 +378,10 @@ class GameEngine
 
     if @player_velocity[0] < -max_v
       @player_velocity[0] = -max_v
+    end
+
+    if @player_velocity[2] > max_v
+      @player_velocity[2] = max_v
     end
 
     if @player_velocity[2] < -max_v
@@ -387,18 +400,21 @@ class GameEngine
     @py = py
 
     @players.each { |key, rpv|
-      player_position, player_velocity = *rpv
+      player_position, player_velocity, pressing = *rpv
 
-      player_velocity[0] += (player_velocity[0] * -1.0) * friction
-      player_velocity[2] += (player_velocity[2] * -1.0) * friction
+      #unless pressing
+      #  player_velocity[0] += (player_velocity[0] * -1.0) * friction
+      #  player_velocity[2] += (player_velocity[2] * -1.0) * friction
+      #end
 
-      player_position[0] += (player_velocity[0] * delta_time)
-      player_position[2] += (player_velocity[2] * delta_time)
+      player_position[0] += (player_velocity[0] * delta_time * 0.5)
+      player_position[2] += (player_velocity[2] * delta_time * 0.5)
     }
 
     if @time_since_last_hop > hop_timeout
       @time_since_last_hop = 0
-      gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity]}})
+      gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity, @pressing]}})
+      @sent += 1
     end 
 
     :keep_running
@@ -436,7 +452,16 @@ class GameEngine
   end
 
   def draw_twod(gl)
-    gl.label(@maze_level.to_s + " | " + @ticks.to_s + " | " + ("%04.1f" % ((@last_delta_time || 0.0) * 1000.0)) + " | " + ("%04.1f" % (@last_global_time || 0.0)))
+    gl.label(game_status)
+  end
+
+  def game_status
+    @maze_level.to_s + " | " + 
+    @ticks.to_s + " | " +
+    ("%04.1f" % ((@last_delta_time || 0.0) * 1000.0)) + " | " +
+    ("%04.1f" % (@last_global_time || 0.0)) + " | " +
+    @sent.to_s + " | " +
+    @pressing.to_s
   end
 
   def track_other_players!(msg)
@@ -456,13 +481,13 @@ Wkndr.nonce {
     gl.open_default_view!
 
     chicken_file = "resources/chicken.glb"
-    cube = Model.new(chicken_file, "", 0.125)
+    cube = Model.new(gl, chicken_file, "", 0.125)
 
     shapes = {}
 
     16.times { |i|
       shape_file = "resources/shape-#{i}.glb"
-      shapes[i] = Model.new(shape_file, "", 1.0)
+      shapes[i] = Model.new(gl, shape_file, "", 1.0)
     }
 
     GameEngine.start(gl, cube, shapes)
