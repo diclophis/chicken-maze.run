@@ -1,23 +1,49 @@
-#version 100
+
+#ifdef NEWER_GL
+precision mediump float;
+#endif
+
+//#version 300 es
+//#version 100
+//
+//#define highp
+//#define mediump
+//#define lowp
 
 // Input vertex attributes
+#ifdef NEWER_GL
+in vec3 vertexPosition;
+in vec2 vertexTexCoord;
+in vec3 vertexNormal;
+in vec4 vertexColor;
+#else
 attribute vec3 vertexPosition;
 attribute vec2 vertexTexCoord;
 attribute vec3 vertexNormal;
 attribute vec4 vertexColor;
+#endif
 
-// Input uniform values
+//// Input uniform values
 uniform mat4 mvp;
 uniform mat4 matModel;
 
 // Output vertex attributes (to fragment shader)
+#ifdef NEWER_GL
+out vec3 fragPosition;
+out vec2 fragTexCoord;
+out vec4 fragColor;
+out vec3 fragNormal;
+#else
 varying vec3 fragPosition;
 varying vec2 fragTexCoord;
 varying vec4 fragColor;
 varying vec3 fragNormal;
+#endif
 
 // NOTE: Add here your custom variables
+//attribute vec4 vertexColor; // in_Color
 
+#ifndef NEWER_GL
 // https://github.com/glslify/glsl-inverse
 mat3 inverse(mat3 m)
 {
@@ -43,9 +69,22 @@ mat3 transpose(mat3 m)
               m[0][1], m[1][1], m[2][1],
               m[0][2], m[1][2], m[2][2]);
 }
+#endif
 
 void main()
 {
+    //    /* first transform the normal into eye space and normalize the result */
+    //    mat3 normalMatrix = transpose(inverse(mat3(matModel)));
+    //    fragNormal = normalize(normalMatrix*vertexNormal);
+
+    //    // Send vertex attributes to fragment shader
+    //    fragPosition = vec3(matModel*vec4(vertexPosition, 1.0f));
+    //    fragTexCoord = vertexTexCoord;
+    //    fragColor = vertexColor;
+
+    //    //// Calculate final vertex position
+    //    gl_Position = mvp*vec4(vertexPosition, 1.0);
+
     // Send vertex attributes to fragment shader
     fragPosition = vec3(matModel*vec4(vertexPosition, 1.0));
     fragTexCoord = vertexTexCoord;

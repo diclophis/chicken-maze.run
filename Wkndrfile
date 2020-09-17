@@ -67,8 +67,8 @@ class GameEngine
     @lin_y2 = 0.0
 
     @fovy = 33.0
-    @maze_draw_distance = 2
-    @maze_draw_distance_h = @maze_draw_distance / 2
+    @maze_draw_distance = 1
+    @maze_draw_distance_h = 0 #@maze_draw_distance / 2
 
     @cool_down = [99, 99]
 
