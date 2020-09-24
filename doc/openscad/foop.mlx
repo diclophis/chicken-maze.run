@@ -33,9 +33,14 @@
   <Param name="onSelected" description="Only on selection" tooltip="If checked, only affects selected vertices" value="false" type="RichBool" isxmlparam="0"/>
  </filter>
 
+<!--
+ <filter name="Random Face Color"/>
+ <filter name="Transfer Color: Face to Vertex"/>
+
  <filter name="Smooth: Laplacian Vertex Color">
   <Param type="RichInt" tooltip="the number of iteration of the smoothing algorithm" name="iteration" description="Iteration" isxmlparam="0" value="1"/>
  </filter>
+-->
 
  <filter name="Transfer: Vertex Color to Texture">
   <Param name="textName" tooltip="The texture file to be created" isxmlparam="0" value="shape-null_tex.png" type="RichString" description="Texture file"/>

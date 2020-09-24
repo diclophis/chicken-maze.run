@@ -27,7 +27,7 @@ class GameEngine
     if direction == :level_down
       @start_at_exit = true
     elsif direction == :level_up
-      @player_position = [-0.45,@floor_position-0.025,0.0]
+      @player_position = [-0.40,@floor_position-0.025,0.0]
     end
 
     @pressing = false
@@ -67,7 +67,7 @@ class GameEngine
     @lin_y2 = 0.0
 
     @fovy = 33.0
-    @maze_draw_distance = 1
+    @maze_draw_distance = 3
     @maze_draw_distance_h = 0 #@maze_draw_distance / 2
 
     @cool_down = [99, 99]
@@ -110,7 +110,7 @@ class GameEngine
     @game.draw_twod(gl)
   end
 
-  def self.start(gl, cube, shapes, starting_level = 1, direction = :level_up)
+  def self.start(gl, cube, shapes, starting_level = 10, direction = :level_up)
     @start_game_proc ||= Proc.new { |maze_level, direction_inner|
       @camera = GameCamera.new
       @game = self.new(maze_level, cube, shapes, direction_inner)
@@ -143,7 +143,7 @@ class GameEngine
       @maze = b
 
       if @start_at_exit
-        @player_position = [@maze_exit[0] - 0.55,@floor_position-0.025, @maze_exit[1]]
+        @player_position = [@maze_exit[0] - 0.60,@floor_position-0.025, @maze_exit[1]]
       end
     end
   end
