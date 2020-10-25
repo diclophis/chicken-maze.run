@@ -110,7 +110,7 @@ class GameEngine
     @game.draw_twod(gl)
   end
 
-  def self.start(gl, cube, shapes, starting_level = 10, direction = :level_up)
+  def self.start(gl, cube, shapes, starting_level = 1, direction = :level_up)
     @start_game_proc ||= Proc.new { |maze_level, direction_inner|
       @camera = GameCamera.new
       @game = self.new(maze_level, cube, shapes, direction_inner)
