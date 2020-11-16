@@ -8,8 +8,8 @@ class GameEngine
       maze_level = 1
     end
 
-    @shapes = shapes
     @cube = cube
+    @shapes = shapes
     @batcher = batcher
     @shape_batchers = shape_batchers
     @shaped = 0
@@ -103,7 +103,7 @@ class GameEngine
   end
 
   def self.draw_threed(gl)
-    @camera.lookat(gl, @game.player_position)
+    #@camera.lookat(gl, @game.player_position)
 
     @game.draw_threed(gl)
   end
@@ -425,9 +425,9 @@ class GameEngine
   def draw_threed(gl)
     return unless @maze && @px && @py
 
-    @shapes.each { |i, shape|
-      shape.reset
-    }
+    #@shapes.each { |i, shape|
+    #  shape.reset
+    #}
 
     ((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
       ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
@@ -435,20 +435,20 @@ class GameEngine
           cell = @maze[x][y]
           unless cell == 0
             primary = (cell & PRIMARY)
-            if shape = @shapes[primary]
-              shape.deltas(1.0, 1.0, 1.0)
-              shape.deltar(0.0, 1.0, 0.0, 0.0)
-              shape.deltap(x, 0, y)
-              shape.next #draw(false)
-            end
+            #if shape = @shapes[primary]
+            #  shape.deltas(1.0, 1.0, 1.0)
+            #  shape.deltar(0.0, 1.0, 0.0, 0.0)
+            #  shape.deltap(x, 0, y)
+            #  shape.next #draw(false)
+            #end
           end
         end
       end
     end
 
-    @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
-    @cube.deltap(*@player_position)
     @cube.deltas(0.125, 0.125, 0.125)
+    #@cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
+    @cube.deltap(*@player_position)
 
     #@cube.draw(false)
 
@@ -529,25 +529,27 @@ end
 Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
+    gl.lookat(1, 45.0, 33.0, 45.0, 0.0, 0.1, 0.0, 40.0)
 
-    chicken_file = "resources/chicken.glb"
-    chicken_model = Model.new(gl, chicken_file, "", 0.125)
+    #chicken_file = "resources/chicken.glb"
+    #chicken_model = Model.new(gl, chicken_file, "", 0.125)
+    chicken_model = Cube.new(gl, 1.0, 1.0, 1.0, 0.125)
     chicken_batcher = CubicBatchingSystem.new({}, chicken_model, 1)
-
     cube = chicken_batcher.at(0)
 
     shape_batchers = {}
-    16.times { |i|
-      shape_file = "resources/shape-#{i}.glb"
-      m = Model.new(gl, shape_file, "", 1.0)
-      shape_batchers[i] = CubicBatchingSystem.new({}, m, 1000)
-    }
-
     shapes = {}
 
-    16.times { |i|
-      shapes[i] = ShapeProxy.new(shape_batchers[i], 1000)
-    }
+    #16.times { |i|
+    #  shape_file = "resources/shape-#{i}.glb"
+    #  m = Model.new(gl, shape_file, "", 1.0)
+    #  shape_batchers[i] = CubicBatchingSystem.new({}, m, 1)
+    #}
+
+
+    #16.times { |i|
+    #  shapes[i] = ShapeProxy.new(shape_batchers[i], 1)
+    #}
 
     GameEngine.start(gl, cube, shapes, chicken_batcher, shape_batchers)
   }
@@ -567,6 +569,7 @@ Wkndr.client_side { |gl|
 
     gl.drawmode {
       gl.threed {
+        gl.lookat(1, 45.0, 33.0, 45.0, 0.0, 0.1, 0.0, 40.0)
         GameEngine.draw_threed(gl)
       }
       gl.twod {
