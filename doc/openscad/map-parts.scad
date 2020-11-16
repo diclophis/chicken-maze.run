@@ -1,11 +1,13 @@
 // maze parts
 
 outer_size = 1.0;
-cut_size = outer_size * 0.25;
+cut_size = outer_size * 0.0;
 inner_size = outer_size * 1.0;
 path_size = outer_size * 0.25;
 inner_path_size = path_size * 0.75;
-fudge = 0.125 * outer_size;
+fudge = 0.162 * outer_size;
+fudgeg = 0.125 * outer_size;
+
 inner_intersection_size = 1.5;
 quarter_slice_size = 0.5;
 outer_fudge_smidge = (outer_size+fudge)*1.02;
@@ -219,8 +221,8 @@ module pathwayy(direction_in) {
 
             translate([0,0,-path_size*0.75]) {
                 union() {
-                    cube(size=[path_size+fudge, outer_size+fudge, path_size+fudge], center=true);
-                    cube(size=[outer_size+fudge, path_size+fudge, path_size+fudge], center=true);
+                    cube(size=[path_size+fudge, outer_size+fudge, path_size+fudgeg], center=true);
+                    cube(size=[outer_size+fudge, path_size+fudge, path_size+fudgeg], center=true);
                 }
             }
         }
@@ -229,7 +231,7 @@ module pathwayy(direction_in) {
 
 //for (offset=[0:15]) {
 //    translate([(offset*(outer_size+0)),0,0]) {
-//        pathwayx(offset);
+//        pathwayy(offset);
 //    }
 //}
 
