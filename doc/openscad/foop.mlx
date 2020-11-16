@@ -2,13 +2,9 @@
 <FilterScript>
 
  <filter name="Subdivision Surfaces: Midpoint">
-  <Param value="1" isxmlparam="0" type="RichInt" name="Iterations" tooltip="Number of time the model is subdivided." description="Iterations"/>
-  <Param value="0.1" max="2.0" isxmlparam="0" type="RichAbsPerc" min="0" name="Threshold" tooltip="All the edges &lt;b>longer&lt;/b> than this threshold will be refined.&lt;br>Setting this value to zero will force an uniform refinement." description="Edge Threshold"/>
+  <Param value="10" isxmlparam="0" type="RichInt" name="Iterations" tooltip="Number of time the model is subdivided." description="Iterations"/>
+  <Param value="0.01" max="2.0" isxmlparam="0" type="RichAbsPerc" min="0" name="Threshold" tooltip="All the edges &lt;b>longer&lt;/b> than this threshold will be refined.&lt;br>Setting this value to zero will force an uniform refinement." description="Edge Threshold"/>
   <Param value="false" isxmlparam="0" type="RichBool" name="Selected" tooltip="If selected the filter affect only the selected faces" description="Affect only selected faces"/>
- </filter>
-
- <filter name="Merge Close Vertices">
-  <Param max="0.01" isxmlparam="0" description="Merging distance" value="0.005" name="Threshold" tooltip="All the vertices that closer than this threshold are merged together. Use very small values, default values is 1/10000 of bounding box diagonal. " min="0" type="RichAbsPerc"/>
  </filter>
 
  <filter name="Re-Orient all faces coherentely"/>
@@ -38,4 +34,28 @@
  </filter>
  <filter name="Delete Selected Faces"/>
 
+<!--
+ <filter name="Fractal Displacement">
+  <Param value="0.0178536" type="RichAbsPerc" isxmlparam="0" tooltip="Defines the maximum height for the perturbation." description="Max height:" min="0" max="0.446339" name="maxHeight"/>
+  <Param value="1" type="RichDynamicFloat" isxmlparam="0" tooltip="Scales the fractal perturbation in and out. Values larger than 1 mean zoom out; values smaller than one mean zoom in." description="Scale factor:" min="0" max="10" name="scale"/>
+  <Param value="5" type="RichInt" isxmlparam="0" tooltip="Face normals will be smoothed to make the perturbation more homogeneous. This parameter represents the number of smoothing steps." description="Normals smoothing steps:" name="smoothingSteps"/>
+  <Param value="2" type="RichFloat" isxmlparam="0" tooltip="By varying this seed, the terrain morphology will change.&#xa;Don't change the seed if you want to refine the current terrain morphology by changing the other parameters." description="Seed:" name="seed"/>
+  <Param value="4" enum_val4="Ridged multifractal terrain" type="RichEnum" enum_val0="fBM (fractal Brownian Motion)" isxmlparam="0" enum_val3="Hybrid multifractal terrain" tooltip="The algorithm with which the fractal terrain will be generated." enum_cardinality="5" description="Algorithm" enum_val1="Standard multifractal" enum_val2="Heterogeneous multifractal" name="algorithm"/>
+  <Param value="8" type="RichDynamicFloat" isxmlparam="0" tooltip="The number of Perlin noise frequencies that will be used to generate the terrain. Reasonable values are in range [2,9]." description="Octaves:" min="1" max="20" name="octaves"/>
+  <Param value="4" type="RichFloat" isxmlparam="0" tooltip="The gap between noise frequencies. This parameter is used in conjunction with fractal increment to compute the spectral weights that contribute to the noise in each octave." description="Lacunarity:" name="lacunarity"/>
+  <Param value="0.2" type="RichFloat" isxmlparam="0" tooltip="This parameter defines how rough the generated terrain will be. The range of reasonable values changes according to the used algorithm, however you can choose it in range [0.2, 1.5]." description="Fractal increment:" name="fractalIncrement"/>
+  <Param value="0.9" type="RichFloat" isxmlparam="0" tooltip="This parameter controls the multifractality of the generated terrain. If offset is low, then the terrain will be smooth." description="Offset:" name="offset"/>
+  <Param value="2.5" type="RichFloat" isxmlparam="0" tooltip="Ignored in all the algorithms except the ridged one. This parameter defines how hard the terrain will be." description="Gain:" name="gain"/>
+  <Param value="false" type="RichBool" isxmlparam="0" tooltip="Saves the perturbation value as vertex quality." description="Save as vertex quality" name="saveAsQuality"/>
+ </filter>
+-->
+
+ <filter name="Merge Close Vertices">
+  <Param max="0.1" isxmlparam="0" description="Merging distance" value="0.0015" name="Threshold" tooltip="All the vertices that closer than this threshold are merged together. Use very small values, default values is 1/10000 of bounding box diagonal. " min="0" type="RichAbsPerc"/>
+ </filter>
+
+ <filter name="Simplification: Clustering Decimation">
+  <Param name="Threshold" max="0.661909" description="Cell Size" tooltip="The size of the cell of the clustering grid. Smaller the cell finer the resulting mesh. For obtaining a very coarse mesh use larger values." value="0.0333" min="0" type="RichAbsPerc" isxmlparam="0"/>
+  <Param name="Selected" description="Affect only selected faces" tooltip="If selected the filter affect only the selected faces" value="false" type="RichBool" isxmlparam="0"/>
+ </filter>
 </FilterScript>
