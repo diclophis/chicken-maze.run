@@ -3,7 +3,7 @@
 class GameEngine
   PRIMARY  = 0x000000FF
 
-  def initialize(maze_level, cube, shapes, batcher, direction)
+  def initialize(maze_level, cube, shapes, batcher, shape_batchers, direction)
     if maze_level < 1
       maze_level = 1
     end
@@ -11,6 +11,7 @@ class GameEngine
     @shapes = shapes
     @cube = cube
     @batcher = batcher
+    @shape_batchers = shape_batchers
     @shaped = 0
 
     @px = 0
@@ -68,7 +69,7 @@ class GameEngine
     @lin_y2 = 0.0
 
     @fovy = 33.0
-    @maze_draw_distance = 3
+    @maze_draw_distance = 10
     @maze_draw_distance_h = 0 #@maze_draw_distance / 2
 
     @cool_down = [99, 99]
@@ -111,10 +112,10 @@ class GameEngine
     @game.draw_twod(gl)
   end
 
-  def self.start(gl, cube, shapes, batcher, starting_level = 1, direction = :level_up)
+  def self.start(gl, cube, shapes, batcher, shape_batchers, starting_level = 1, direction = :level_up)
     @start_game_proc ||= Proc.new { |maze_level, direction_inner|
       @camera = GameCamera.new
-      @game = self.new(maze_level, cube, shapes, batcher, direction_inner)
+      @game = self.new(maze_level, cube, shapes, batcher, shape_batchers, direction_inner)
       gl.emit({"mkmaze" => @game.level})
     }
     @start_game_proc.call(starting_level, direction)
@@ -422,22 +423,28 @@ class GameEngine
   end
 
   def draw_threed(gl)
-    #return unless @maze && @px && @py
+    return unless @maze && @px && @py
 
-    #((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
-    #  ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
-    #    if x>=0 && x<@maze_s && y>=0 && y<@maze_s
-    #      cell = @maze[x][y]
-    #      unless cell == 0
-    #        primary = (cell & PRIMARY)
-    #        if shape = @shapes[primary]
-    #          shape.deltap(x, 0, y)
-    #          shape.draw(false)
-    #        end
-    #      end
-    #    end
-    #  end
-    #end
+    @shapes.each { |i, shape|
+      shape.reset
+    }
+
+    ((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
+      ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
+        if x>=0 && x<@maze_s && y>=0 && y<@maze_s
+          cell = @maze[x][y]
+          unless cell == 0
+            primary = (cell & PRIMARY)
+            if shape = @shapes[primary]
+              shape.deltas(1.0, 1.0, 1.0)
+              shape.deltar(0.0, 1.0, 0.0, 0.0)
+              shape.deltap(x, 0, y)
+              shape.next #draw(false)
+            end
+          end
+        end
+      end
+    end
 
     @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
     @cube.deltap(*@player_position)
@@ -445,7 +452,11 @@ class GameEngine
 
     #@cube.draw(false)
 
-    @batcher.draw
+    #@shape_batchers.each { |i, batcher|
+    #  batcher.draw(@shapes[i].current_shape)
+    #}
+
+    @batcher.draw(1)
     
     #@players.each { |key, rpv|
     #  player_position, player_velocity = *rpv
@@ -480,6 +491,41 @@ class GameEngine
   end
 end
 
+class ShapeProxy
+  def initialize(batcher, count)
+    @shapes = []
+    count.times { |i|
+      @shapes << batcher.at(i)
+    }
+
+    reset
+  end
+
+  def reset
+    @current_shape = 0
+  end
+
+  def deltap(*args)
+    @shapes[@current_shape].deltap(*args)
+  end
+
+  def deltas(*args)
+    @shapes[@current_shape].deltas(*args)
+  end
+
+  def deltar(*args)
+    @shapes[@current_shape].deltar(*args)
+  end
+
+  def next
+    @current_shape += 1
+  end
+
+  def current_shape
+    @current_shape
+  end
+end
+
 Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
@@ -490,14 +536,20 @@ Wkndr.nonce {
 
     cube = chicken_batcher.at(0)
 
+    shape_batchers = {}
+    16.times { |i|
+      shape_file = "resources/shape-#{i}.glb"
+      m = Model.new(gl, shape_file, "", 1.0)
+      shape_batchers[i] = CubicBatchingSystem.new({}, m, 1000)
+    }
+
     shapes = {}
 
     16.times { |i|
-      shape_file = "resources/shape-#{i}.glb"
-      shapes[i] = Model.new(gl, shape_file, "", 1.0)
+      shapes[i] = ShapeProxy.new(shape_batchers[i], 1000)
     }
 
-    GameEngine.start(gl, cube, shapes, chicken_batcher)
+    GameEngine.start(gl, cube, shapes, chicken_batcher, shape_batchers)
   }
 }
 
