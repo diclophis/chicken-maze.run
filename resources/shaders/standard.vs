@@ -130,7 +130,8 @@ attribute vec4 vertexColor;
 uniform mat4 mvp;
 //uniform mat4 matModel;
 //layout (location = 12) in mat4 matModel;
-layout (location = 12) in mat4 matModel;
+//layout (location = 12) in mat4 matModel;
+in mat4 matModel;
 //uniform mat4 matModel;
 //////////////////////////////////////////////////////
 

@@ -1,7 +1,7 @@
 <!DOCTYPE FilterScript>
 <FilterScript>
  <filter name="Subdivision Surfaces: Midpoint">
-  <Param type="RichInt" value="1" name="Iterations"/>
+  <Param type="RichInt" value="2" name="Iterations"/>
   <Param type="RichAbsPerc" value="0.01" min="0" name="Threshold" max="1.5"/>
   <Param type="RichBool" value="false" name="Selected"/>
  </filter>
@@ -28,10 +28,12 @@
   <Param name="method" isxmlparam="0" enum_val1="Space-optimizing" enum_cardinality="2" enum_val0="Basic" value="1" description="Method" type="RichEnum" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain"/>
  </filter>
 
+<!--
  <filter name="Vertex Color Filling">
   <Param name="color1" description="Color:" tooltip="Sets the color to apply to vertices." a="255" g="128" b="128" r="128" type="RichColor" isxmlparam="0"/>
   <Param name="onSelected" description="Only on selection" tooltip="If checked, only affects selected vertices" value="false" type="RichBool" isxmlparam="0"/>
  </filter>
+-->
 
 <!--
  <filter name="Random Face Color"/>
@@ -42,6 +44,7 @@
  </filter>
 -->
 
+<!--
  <filter name="Transfer: Vertex Color to Texture">
   <Param name="textName" tooltip="The texture file to be created" isxmlparam="0" value="shape-null_tex.png" type="RichString" description="Texture file"/>
   <Param name="textW" tooltip="The texture width" isxmlparam="0" value="1024" type="RichInt" description="Texture width (px)"/>
@@ -50,5 +53,6 @@
   <Param name="assign" tooltip="assign the newly created texture" isxmlparam="0" value="false" type="RichBool" description="Assign texture"/>
   <Param name="pullpush" tooltip="if enabled the unmapped texture space is colored using a pull push filling algorithm, if false is set to black" isxmlparam="0" value="true" type="RichBool" description="Fill texture"/>
  </filter>
+-->
 
 </FilterScript>
