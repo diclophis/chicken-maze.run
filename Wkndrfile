@@ -538,25 +538,26 @@ Wkndr.nonce {
     gl.open_default_view!
     #gl.lookat(1, 45.0, 33.0, 45.0, 0.0, 0.1, 0.0, 40.0)
 
-    chicken_file = "resources/chicken.glb"
-    chicken_model = Model.new(gl, chicken_file, "", 0.125)
+    @store = {}
+    @chicken_file = "resources/chicken.glb"
+    @chicken_model = Model.new(gl, @chicken_file, "", 0.125)
     #chicken_model = Cube.new(gl, 1.0, 1.0, 1.0, 0.125)
-    chicken_batcher = CubicBatchingSystem.new({}, chicken_model, 1)
+    @chicken_batcher = CubicBatchingSystem.new(@store, @chicken_model, 1)
     #cube = chicken_batcher.at(0)
-    cube = ShapeProxy.new(chicken_batcher, 1)
+    @cube_cube = ShapeProxy.new(@chicken_batcher, 1)
 
-    shape_batchers = {}
-    shapes = {}
+    @shape_batchers = {}
+    @shapes = {}
 
     16.times { |i|
       shape_file = "resources/shape-#{i}.glb"
       m = Model.new(gl, shape_file, "", 1.0)
-      batcher = CubicBatchingSystem.new({}, m, 1000)
-      shapes[i] = ShapeProxy.new(batcher, 1000)
-      shape_batchers[i] = batcher
+      batcher = CubicBatchingSystem.new(@store, m, 1000)
+      @shapes[i] = ShapeProxy.new(batcher, 1000)
+      @shape_batchers[i] = batcher
     }
 
-    GameEngine.start(gl, cube, shapes, chicken_batcher, shape_batchers)
+    GameEngine.start(gl, @cube_cube, @shapes, @chicken_batcher, @shape_batchers)
   }
 }
 
