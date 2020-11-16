@@ -76,6 +76,7 @@ Wkndr.client_side { |gl|
   gl.update { |global_time, delta_time|
     gl.drawmode {
       gl.threed {
+        gl.lookat(1, 15.0, 23.0, 15.0, 0.0, 0.1, 0.0, 30.0)
 
         @proxy.reset
         32.times { |i|
