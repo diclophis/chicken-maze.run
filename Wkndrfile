@@ -103,7 +103,7 @@ class GameEngine
   end
 
   def self.draw_threed(gl)
-    #@camera.lookat(gl, @game.player_position)
+    @camera.lookat(gl, @game.player_position)
 
     @game.draw_threed(gl)
   end
@@ -447,7 +447,7 @@ class GameEngine
     end
 
     @cube.deltas(0.125, 0.125, 0.125)
-    #@cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
+    @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
     @cube.deltap(*@player_position)
 
     #@cube.draw(false)
@@ -529,7 +529,7 @@ end
 Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
-    gl.lookat(1, 45.0, 33.0, 45.0, 0.0, 0.1, 0.0, 40.0)
+    #gl.lookat(1, 45.0, 33.0, 45.0, 0.0, 0.1, 0.0, 40.0)
 
     #chicken_file = "resources/chicken.glb"
     #chicken_model = Model.new(gl, chicken_file, "", 0.125)
@@ -569,7 +569,7 @@ Wkndr.client_side { |gl|
 
     gl.drawmode {
       gl.threed {
-        gl.lookat(1, 45.0, 33.0, 45.0, 0.0, 0.1, 0.0, 40.0)
+        #gl.lookat(1, 45.0, 33.0, 45.0, 0.0, 0.1, 0.0, 40.0)
         GameEngine.draw_threed(gl)
       }
       gl.twod {
