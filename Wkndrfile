@@ -613,9 +613,9 @@ Wkndr.client_side { |gl|
       gl.threed {
         GameEngine.draw_threed(gl)
       }
-      #gl.twod {
-      #  #GameEngine.draw_twod(gl)
-      #}
+      gl.twod {
+        GameEngine.draw_twod(gl)
+      }
     }
 
     GameEngine.process_time(gl, global_time, delta_time)
