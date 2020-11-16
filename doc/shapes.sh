@@ -34,7 +34,7 @@ for I in `seq 0 15`
 do
   $OPENSCAD -D shape=${I} -o tmp/shape-${I}.stl doc/openscad/map-parts.scad
 
-  FOO="-m vc"
+  FOO="-m vc vn vt wt"
   #MESHARGS="-l /var/tmp/mllog -i ./tmp/shape-${I}.stl -o ./tmp/shape-${I}-mid.obj $FOO -s doc/openscad/$FILTERS"
   MESHARGS="-l /var/tmp/mllog -i tmp/shape-${I}.stl -o tmp/shape-${I}.obj $FOO -s doc/openscad/foop.mlx"
 

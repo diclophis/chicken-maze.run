@@ -17,12 +17,44 @@
             ],
             "min": [
                 -0.5,
-                -0.0,
+                0.0,
                 -0.5
             ]
         },
         {
             "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 4416,
+            "type": "VEC3",
+            "max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ]
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 4416,
+            "type": "VEC2",
+            "max": [
+                1.0,
+                0.9473680257797241
+            ],
+            "min": [
+                0.0,
+                0.0
+            ]
+        },
+        {
+            "bufferView": 3,
             "byteOffset": 0,
             "componentType": 5126,
             "count": 4416,
@@ -41,7 +73,7 @@
             ]
         },
         {
-            "bufferView": 2,
+            "bufferView": 4,
             "byteOffset": 0,
             "componentType": 5125,
             "count": 4416,
@@ -56,7 +88,7 @@
     ],
     "buffers": [
         {
-            "byteLength": 141312,
+            "byteLength": 229632,
             "uri": "shape-15.bin"
         }
     ],
@@ -70,26 +102,32 @@
         {
             "buffer": 0,
             "byteOffset": 52992,
+            "byteLength": 52992,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 105984,
+            "byteLength": 35328,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 141312,
             "byteLength": 70656,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 123648,
+            "byteOffset": 211968,
             "byteLength": 17664,
             "target": 34963
         }
     ],
     "materials": [
         {
-            "name": "DefaultMaterial",
+            "name": "material_0_material",
             "pbrMetallicRoughness": {
-                "baseColorFactor": [
-                    0.6000000238418579,
-                    0.6000000238418579,
-                    0.6000000238418579,
-                    1.0
-                ],
                 "metallicFactor": 0.0
             }
         }
@@ -101,10 +139,12 @@
                 {
                     "mode": 4,
                     "material": 0,
-                    "indices": 2,
+                    "indices": 4,
                     "attributes": {
                         "POSITION": 0,
-                        "COLOR_0": 1
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2,
+                        "COLOR_0": 3
                     }
                 }
             ]
