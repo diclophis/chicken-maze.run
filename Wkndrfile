@@ -138,7 +138,7 @@ class GameEngine
   end
 
   def self.draw_threed(gl)
-    @camera.lookat(gl, @game.player_position, 90.0)
+    @camera.lookat(gl, @game.player_position, (@game.level > 3) ? 90.0 : (@game.level * 20.0))
 
     @game.draw_threed(gl)
   end
