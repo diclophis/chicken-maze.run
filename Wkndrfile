@@ -138,7 +138,7 @@ class GameEngine
   end
 
   def self.draw_threed(gl)
-    @camera.lookat(gl, @game.player_position, 100.0)
+    @camera.lookat(gl, @game.player_position, 33.0)
 
     @game.draw_threed(gl)
   end
