@@ -8,7 +8,7 @@
             "bufferView": 0,
             "byteOffset": 0,
             "componentType": 5126,
-            "count": 5286,
+            "count": 408,
             "type": "VEC3",
             "max": [
                 0.5,
@@ -17,7 +17,7 @@
             ],
             "min": [
                 -0.5,
-                0.0010740000288933516,
+                0.0,
                 -0.5
             ]
         },
@@ -25,7 +25,7 @@
             "bufferView": 1,
             "byteOffset": 0,
             "componentType": 5126,
-            "count": 5286,
+            "count": 408,
             "type": "VEC3",
             "max": [
                 1.0,
@@ -34,7 +34,7 @@
             ],
             "min": [
                 -1.0,
-                -0.02265532687306404,
+                0.0,
                 -1.0
             ]
         },
@@ -42,22 +42,22 @@
             "bufferView": 2,
             "byteOffset": 0,
             "componentType": 5126,
-            "count": 5286,
+            "count": 408,
             "type": "VEC2",
             "max": [
                 1.0,
-                0.9294120073318481
+                1.0
             ],
             "min": [
                 0.0,
-                0.3882349729537964
+                0.0
             ]
         },
         {
             "bufferView": 3,
             "byteOffset": 0,
             "componentType": 5126,
-            "count": 5286,
+            "count": 408,
             "type": "VEC4",
             "max": [
                 1.0,
@@ -76,10 +76,10 @@
             "bufferView": 4,
             "byteOffset": 0,
             "componentType": 5125,
-            "count": 5286,
+            "count": 408,
             "type": "SCALAR",
             "max": [
-                2642.0
+                203.0
             ],
             "min": [
                 0.0
@@ -88,7 +88,7 @@
     ],
     "buffers": [
         {
-            "byteLength": 274872,
+            "byteLength": 21216,
             "uri": "shape-0.bin"
         }
     ],
@@ -96,31 +96,31 @@
         {
             "buffer": 0,
             "byteOffset": 0,
-            "byteLength": 63432,
+            "byteLength": 4896,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 63432,
-            "byteLength": 63432,
+            "byteOffset": 4896,
+            "byteLength": 4896,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 126864,
-            "byteLength": 42288,
+            "byteOffset": 9792,
+            "byteLength": 3264,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 169152,
-            "byteLength": 84576,
+            "byteOffset": 13056,
+            "byteLength": 6528,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 253728,
-            "byteLength": 21144,
+            "byteOffset": 19584,
+            "byteLength": 1632,
             "target": 34963
         }
     ],
