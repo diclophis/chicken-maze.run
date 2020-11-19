@@ -83,21 +83,21 @@ vec3 ComputeLightDirectional(Light l, vec3 n, vec3 s)
 }
 
 
-//vec3 ComputeLightSpot(Light l, vec3 n, vec3 s)
-//{
-//    vec3 lightToSurface = normalize(fragPosition - l.position);
-//    vec3 lightDir = -normalize(l.target - l.position);
-//    float diff = clamp(float(dot(n, lightDir)), 0.0, 1.0)*l.intensity;
-//    float attenuation = (float(dot(n, lightToSurface)));
-//    attenuation = dot(lightToSurface, -lightDir);
-//    float lightToSurfaceAngle = degrees(acos(attenuation));
-//    if (lightToSurfaceAngle > l.coneAngle) attenuation = 0.0;
-//    float falloff = (l.coneAngle - lightToSurfaceAngle)/l.coneAngle;
-//    float diffAttenuation = diff*attenuation;
-//    float spec = 0.0;
-//
-//    return (falloff*(diffAttenuation*l.color.rgb + spec*s.rgb));
-//}
+vec3 ComputeLightSpot(Light l, vec3 n, vec3 fragPos, vec3 s)
+{
+    vec3 lightToSurface = normalize(fragPos - l.position);
+    vec3 lightDir = -normalize(l.target - l.position);
+    float diff = clamp(float(dot(n, lightDir)), 0.0, 1.0)*l.intensity;
+    float attenuation = (float(dot(n, lightToSurface)));
+    attenuation = dot(lightToSurface, -lightDir);
+    float lightToSurfaceAngle = degrees(acos(attenuation));
+    if (lightToSurfaceAngle > l.coneAngle) attenuation = 0.0;
+    float falloff = (l.coneAngle - lightToSurfaceAngle)/l.coneAngle;
+    float diffAttenuation = diff*attenuation;
+    float spec = 0.0;
+
+    return (falloff*(diffAttenuation*l.color.rgb + spec*s.rgb));
+}
 
 
 vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -156,17 +156,24 @@ void main()
         {
             vec3 light = vec3(0.0);
 
-            if (lights[i].type == LIGHT_DIRECTIONAL) 
+            if (lights[i].type == LIGHT_DIRECTIONAL)
             {
               //light = -normalize(lights[i].target - lights[i].position);
               light = ComputeLightDirectional(lights[i], normal, specular);
             }
        
-            if (lights[i].type == LIGHT_POINT) 
+            if (lights[i].type == LIGHT_POINT)
             {
               //light = normalize(lights[i].position - fragPosition);
               //light = ComputeLightPoint(lights[i], normal, specular);
               light = CalcPointLight(lights[i], normal, fragPositionn, viewDir);  
+            }
+
+            if (lights[i].type == LIGHT_SPOT)
+            {
+              //light = normalize(lights[i].position - fragPosition);
+              //light = ComputeLightPoint(lights[i], normal, specular);
+              light = ComputeLightSpot(lights[i], normal, fragPositionn, viewDir);  
             }
 
             float NdotL = max(dot(normal, light), 0.0);
