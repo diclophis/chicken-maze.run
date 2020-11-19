@@ -57,7 +57,7 @@
 -->
 
  <filter name="Simplification: Quadric Edge Collapse Decimation">
-  <Param type="RichInt" tooltip="The desired final number of faces." isxmlparam="0" name="TargetFaceNum" description="Target number of faces" value="2048"/>
+  <Param type="RichInt" tooltip="The desired final number of faces." isxmlparam="0" name="TargetFaceNum" description="Target number of faces" value="4096"/>
   <Param type="RichFloat" tooltip="If non zero, this parameter specifies the desired final size of the mesh as a percentage of the initial size." isxmlparam="0" name="TargetPerc" description="Percentage reduction (0..1)" value="0"/>
   <Param type="RichFloat" tooltip="Quality threshold for penalizing bad shaped faces.&lt;br>The value is in the range [0..1]&#xa; 0 accept any kind of face (no penalties),&#xa; 0.5  penalize faces with quality &lt; 0.5, proportionally to their shape&#xa;" isxmlparam="0" name="QualityThr" description="Quality threshold" value="0.3"/>
   <Param type="RichBool" tooltip="The simplification process tries to do not affect mesh boundaries during simplification" isxmlparam="0" name="PreserveBoundary" description="Preserve Boundary of the mesh" value="true"/>
