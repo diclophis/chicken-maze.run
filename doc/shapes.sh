@@ -57,7 +57,7 @@ do
   #assimp export tmp/shape-${I}.obj resources/shape-${I}.iqm -om -og -l -v 
   #assimp export tmp/shape-${I}.obj resources/shape-${I}.glb -fglb2  -om -og -l -v 
   #assimp export tmp/shape-${I}.obj resources/shape-${I}.glb -fglb2 --flip-uv --improve-cache-locality --remove-redundant-materials --join-identical-vertices --validate-data-structure -om -og -l -v 
-  assimp export tmp/shape-${I}.obj resources/shape-${I}.gltf --flip-uv --improve-cache-locality --remove-redundant-materials --join-identical-vertices --validate-data-structure -om -og -l -v 
+  assimp export tmp/shape-${I}.obj resources/maze-${I}.glb -fglb2 --flip-uv --improve-cache-locality --remove-redundant-materials --join-identical-vertices --validate-data-structure -om -og -l -v 
 done
 
 #cp tmp/shape-*.gltf resources/
