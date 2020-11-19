@@ -510,6 +510,7 @@ class GameEngine
       ((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
         ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
           shape = @shapes[0]
+          shape.deltar(0.0, 1.0, 0.0, 0.0)
           #shape.deltas(10.0, 10.0, 10.0)
           #shape.deltap(x * 10.0, -0.125 * 14.0, y * 10.0)
           shape.deltap(x, -0.125, y)
