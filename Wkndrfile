@@ -131,7 +131,7 @@ class GameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
-    @camera.update(gl, global_time, delta_time, 10.5, @game.player_position)
+    @camera.update(gl, global_time, delta_time, 1.5, @game.player_position)
 
     case @game.update(gl, global_time, delta_time)
       when :level_up
