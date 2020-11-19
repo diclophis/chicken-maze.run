@@ -477,7 +477,6 @@ class GameEngine
 
   def draw_threed(gl, camera)
     @camera_angle = camera.angle
-    #return unless @maze && @px && @py
 
     @shapes.each { |i, shape|
       shape.reset
@@ -495,7 +494,9 @@ class GameEngine
                 unless cell == 0
                   primary = (cell & PRIMARY)
                   if shape = @shapes[primary]
+                    shape.deltar(0.0, 1.0, 0.0, 0.0)
                     shape.deltap(x, 0, y)
+                    shape.deltas(1.0, 1.0, 1.0)
                     shape.next #draw(false)
                   end
                 end
@@ -505,15 +506,13 @@ class GameEngine
         end
       end
     else
-      #@cube.deltas(0.125 * 10.0, 0.125 * 10.0, 0.125 * 10.0)
-
       ((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
         ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
           shape = @shapes[0]
           shape.deltar(0.0, 1.0, 0.0, 0.0)
-          #shape.deltas(10.0, 10.0, 10.0)
-          #shape.deltap(x * 10.0, -0.125 * 14.0, y * 10.0)
           shape.deltap(x, -0.125, y)
+          shape.deltas(1.0, 1.0, 1.0)
+          #shape.deltap(x * 10.0, -0.125 * 14.0, y * 10.0)
           shape.next #draw(false)
         end
       end
@@ -524,7 +523,7 @@ class GameEngine
     }
 
     @cube.reset
-    @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.14)) + 0.0)
+    @cube.deltar(0.0, 1.0, 0.0, Math.atan2(@player_velocity[0], @player_velocity[2]) * (180.0/3.1457))
     @cube.deltap(*@player_position)
     @cube.deltas(0.125, 0.125, 0.125)
     @cube.next #@cube.draw(false)
@@ -571,7 +570,7 @@ Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
 
-    distance = 8
+    distance = 16
     a = (((distance) * 2) + 1)
     b = a * a
 
