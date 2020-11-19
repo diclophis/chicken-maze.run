@@ -84,10 +84,10 @@ vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float attenuation = 1.0 / (0.0 + 1.0 * distance + 
   			     1.0 * (distance * distance));    
     // combine results
-    //vec3 ambient  = 0.01 * vec3(1.0); //vec3(texture(material.diffuse, TexCoords));
+    vec3 ambient  = 1.0 * vec3(1.0); //vec3(texture(material.diffuse, TexCoords));
     vec3 diffuse  = 1.0 * diff * vec3(1.0); //vec3(texture(material.diffuse, TexCoords));
     vec3 specular = 1.0 * spec * vec3(1.0); //vec3(texture(material.specular, TexCoords));
-    //ambient  *= attenuation;
+    ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;
     return (diffuse + specular);
@@ -171,16 +171,13 @@ void main()
 
             float NdotL = max(dot(normal, light), 0.0);
             lightDot += lights[i].color.rgb*NdotL;
-
             float specCo = 0.0;
             if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewDir, reflect(-(light), normal))), 1.321); // 16 refers to shine
             specular += specCo;
         }
     }
 
-    finalColor = (texelColor*((colDiffuse + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
-    finalColor += texelColor*(ambient/10.0);
-    
+    finalColor = (((colDiffuse + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
     finalColor = pow(finalColor, vec4(1.0/2.2));
 
 #ifndef NEWER_GL
