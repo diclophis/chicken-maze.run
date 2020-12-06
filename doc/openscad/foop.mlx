@@ -1,23 +1,6 @@
 <!DOCTYPE FilterScript>
 <FilterScript>
 
- <filter name="Parametrization: Trivial Per-Triangle">
-  <Param name="sidedim" isxmlparam="0" value="0" description="Quads per line" type="RichInt" tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation"/>
-  <Param name="textdim" isxmlparam="0" value="2048" description="Texture Dimension (px)" type="RichInt" tooltip="Gives an indication on how big the texture is"/>
-  <Param name="border" isxmlparam="0" value="0" description="Inter-Triangle border (px)" type="RichInt" tooltip="Specifies how many pixels to be left between triangles in parametrization domain"/>
-  <Param name="method" isxmlparam="0" enum_val1="Space-optimizing" enum_cardinality="2" enum_val0="Basic" value="1" description="Method" type="RichEnum" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain"/>
- </filter>
-
- <filter name="Subdivision Surfaces: Midpoint">
-  <Param value="3" isxmlparam="0" type="RichInt" name="Iterations" tooltip="Number of time the model is subdivided." description="Iterations"/>
-  <Param value="0.0" max="2.0" isxmlparam="0" type="RichAbsPerc" min="0" name="Threshold" tooltip="All the edges &lt;b>longer&lt;/b> than this threshold will be refined.&lt;br>Setting this value to zero will force an uniform refinement." description="Edge Threshold"/>
-  <Param value="false" isxmlparam="0" type="RichBool" name="Selected" tooltip="If selected the filter affect only the selected faces" description="Affect only selected faces"/>
- </filter>
-
-<!--
- <filter name="Re-Orient all faces coherentely"/>
--->
-
  <filter name="Transform: Rotate">
   <Param enum_val0="X axis" enum_val1="Y axis" enum_cardinality="4" enum_val2="Z axis" enum_val3="custom axis" type="RichEnum" value="0" name="rotAxis"/>
   <Param enum_val0="origin" enum_val1="barycenter" enum_cardinality="3" enum_val2="custom point" type="RichEnum" value="0" name="rotCenter"/>
@@ -29,6 +12,23 @@
   <Param type="RichBool" value="true" name="Freeze"/>
   <Param type="RichBool" value="false" name="allLayers"/>
  </filter>
+
+ <filter name="Parametrization: Trivial Per-Triangle">
+  <Param name="sidedim" isxmlparam="0" value="0" description="Quads per line" type="RichInt" tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation"/>
+  <Param name="textdim" isxmlparam="0" value="2048" description="Texture Dimension (px)" type="RichInt" tooltip="Gives an indication on how big the texture is"/>
+  <Param name="border" isxmlparam="0" value="0" description="Inter-Triangle border (px)" type="RichInt" tooltip="Specifies how many pixels to be left between triangles in parametrization domain"/>
+  <Param name="method" isxmlparam="0" enum_val1="Space-optimizing" enum_cardinality="2" enum_val0="Basic" value="1" description="Method" type="RichEnum" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain"/>
+ </filter>
+
+ <filter name="Subdivision Surfaces: Midpoint">
+  <Param value="1" isxmlparam="0" type="RichInt" name="Iterations" tooltip="Number of time the model is subdivided." description="Iterations"/>
+  <Param value="0.0" max="2.0" isxmlparam="0" type="RichAbsPerc" min="0" name="Threshold" tooltip="All the edges &lt;b>longer&lt;/b> than this threshold will be refined.&lt;br>Setting this value to zero will force an uniform refinement." description="Edge Threshold"/>
+  <Param value="false" isxmlparam="0" type="RichBool" name="Selected" tooltip="If selected the filter affect only the selected faces" description="Affect only selected faces"/>
+ </filter>
+
+<!--
+ <filter name="Re-Orient all faces coherentely"/>
+-->
 
 <!--
  <filter name="Merge Close Vertices">
@@ -74,6 +74,7 @@
  </filter>
 -->
 
+<!--
  <filter name="Simplification: Quadric Edge Collapse Decimation">
   <Param type="RichInt" tooltip="The desired final number of faces." isxmlparam="0" name="TargetFaceNum" description="Target number of faces" value="4096"/>
   <Param type="RichFloat" tooltip="If non zero, this parameter specifies the desired final size of the mesh as a percentage of the initial size." isxmlparam="0" name="TargetPerc" description="Percentage reduction (0..1)" value="0"/>
@@ -89,10 +90,13 @@
   <Param type="RichBool" tooltip="After the simplification an additional set of steps is performed to clean the mesh (unreferenced vertices, bad faces, etc)" isxmlparam="0" name="AutoClean" description="Post-simplification cleaning" value="true"/>
   <Param type="RichBool" tooltip="The simplification is applied only to the selected set of faces.&#xa; Take care of the target number of faces!" isxmlparam="0" name="Selected" description="Simplify only selected faces" value="false"/>
  </filter>
+-->
 
+<!--
  <filter name="Merge Close Vertices">
   <Param max="0.1" isxmlparam="0" description="Merging distance" value="0.005" name="Threshold" tooltip="All the vertices that closer than this threshold are merged together. Use very small values, default values is 1/10000 of bounding box diagonal. " min="0" type="RichAbsPerc"/>
  </filter>
+-->
 
  <filter name="Re-Compute Face Normals"/>
 

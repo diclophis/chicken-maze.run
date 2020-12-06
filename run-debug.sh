@@ -1,4 +1,3 @@
 #!/bin/bash
 
-docker run --rm -p 8000:8000 kit1zx:latest 
-
+docker run --rm -p 8000:8000 chicken-maze.run:latest 

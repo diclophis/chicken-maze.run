@@ -124,11 +124,9 @@ vec3 ComputeLightSpot(Light l, vec3 n, vec3 fragPos, vec3 s)
 void main()
 {
 
-
 #ifndef NEWER_GL
   vec4 finalColor = vec4(0.0);
 #endif
-
 
 #ifdef NEWER_GL
     vec4 texelColor = texture(texture0, fragTexCoord);
@@ -139,14 +137,15 @@ void main()
 
     vec3 lightDot = vec3(0.0);
     vec3 normal = normalize(fragNormal);
+    vec3 viewDir = normalize(viewPos - fragPositionn);
     vec3 specular = vec3(0.0);
 
-    //vec4 fpp = matModel * vec4(fragPositionn, 1.0); 
-    //vec3 fpp = fragPositionn;
-    //position_cs = (mModelView * vec4(position,1.0)).xyz;
-    //vec3 viewDir = normalize(viewPos);
 
-    vec3 viewDir = normalize(viewPos - fragPositionn);
+    //vec4 texelColor = texture(texture0, fragTexCoord);
+    //vec3 lightDot = vec3(0.0);
+    //vec3 normal = normalize(fragNormal);
+    //vec3 viewD = normalize(viewPos - fragPosition);
+    //vec3 specular = vec3(0.0);
 
     for (int i = 0; i < MAX_LIGHTS; i++)
     {
@@ -156,7 +155,8 @@ void main()
 
             if (lights[i].type == LIGHT_DIRECTIONAL)
             {
-              light = ComputeLightDirectional(lights[i], normal, specular);
+              //light = ComputeLightDirectional(lights[i], normal, specular);
+              light = -normalize(lights[i].target - lights[i].position);
             }
        
             if (lights[i].type == LIGHT_POINT)
@@ -169,19 +169,35 @@ void main()
               light = ComputeLightSpot(lights[i], normal, fragPositionn, viewDir);  
             }
 
+            //float NdotL = max(dot(normal, light), 0.0);
+            //lightDot += lights[i].color.rgb*NdotL;
+            //float specCo = 0.0;
+            //if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewDir, reflect(-(light), normal))), 1.321); // 16 refers to shine
+            //specular += specCo;
+
             float NdotL = max(dot(normal, light), 0.0);
             lightDot += lights[i].color.rgb*NdotL;
+
             float specCo = 0.0;
-            if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewDir, reflect(-(light), normal))), 1.321); // 16 refers to shine
+            if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewDir, reflect(-(light), normal))), 16.0); // 16 refers to shine
             specular += specCo;
         }
     }
 
-    finalColor = (((colDiffuse + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
+    //finalColor = (((colDiffuse + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
+    //finalColor = pow(finalColor, vec4(1.0/2.2));
+
+    //finalColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+    finalColor = (texelColor*((colDiffuse + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
+    finalColor += texelColor*(ambient/10.0)*colDiffuse;
+    
+    // Gamma correction
     finalColor = pow(finalColor, vec4(1.0/2.2));
 
+
 #ifndef NEWER_GL
-  gl_FragColor = finalColor;
+    gl_FragColor = finalColor;
 #endif
 
 }
