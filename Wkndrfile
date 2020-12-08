@@ -223,7 +223,7 @@ class GameEngine
     arrow_keys = gl.keyspressed(KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN)
     speed = 0.1
     friction = speed * 1.1
-    max_v = 1.0
+    max_v = 2.0
     rfx = 1.01
     rfy = 1.01
     hop_timeout = 0.1
@@ -489,7 +489,7 @@ class GameEngine
             if x>=0 && x<@maze_s && y>=0 && y<@maze_s
               a = Math.atan2(y - @py, x - @px)
               deg = (a * (180.0 / 3.1457))
-              if (@camera_angle - deg).abs < 45.0 || ((@px - x).abs < 4) && ((@py - y).abs < 4)
+              if (@camera_angle - deg).abs < 100.0 || ((@px - x).abs < 2) && ((@py - y).abs < 2)
                 cell = @maze[x][y]
                 unless cell == 0
                   primary = (cell & PRIMARY)
@@ -508,14 +508,18 @@ class GameEngine
     else
       ((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
         ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
-          shape = @shapes[0]
-          shape.deltar(0.0, 1.0, 0.0, 0.0)
-          shape.deltap(x, -0.125, y)
-          shape.deltas(1.0, 1.0, 1.0)
-          #shape.deltar(0.0, 1.0, 0.0, 0.0)
-          #shape.deltap(x * 10.0, -0.125 * 14.0, y * 10.0)
-          #shape.deltas(10.0, 10.0, 10.0)
-          shape.next #draw(false)
+          a = Math.atan2(y - @py, x - @px)
+          deg = (a * (180.0 / 3.1457))
+          if (@camera_angle - deg).abs < 100.0 || ((@px - x).abs < 2) && ((@py - y).abs < 2)
+            shape = @shapes[0]
+            shape.deltar(0.0, 1.0, 0.0, 0.0)
+            shape.deltap(x, -0.125, y)
+            shape.deltas(1.0, 1.0, 1.0)
+            #shape.deltar(0.0, 1.0, 0.0, 0.0)
+            #shape.deltap(x * 10.0, -0.125 * 14.0, y * 10.0)
+            #shape.deltas(10.0, 10.0, 10.0)
+            shape.next #draw(false)
+          end
         end
       end
     end
@@ -572,7 +576,7 @@ Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
 
-    distance = 6
+    distance = 8
     a = (((distance) * 2) + 1)
     b = a * a
 
