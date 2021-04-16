@@ -58,7 +58,7 @@ spec:
   - protocol: TCP
     name: app
     port: 8000
-    nodePort: 32641
+    nodePort: 32341
 
 ---
 apiVersion: extensions/v1beta1
