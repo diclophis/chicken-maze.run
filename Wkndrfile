@@ -142,7 +142,7 @@ class GameEngine
   end
 
   def self.draw_threed(gl)
-    @camera.lookat(gl, @game.player_position, 100.0)
+    @camera.lookat(gl, @game.player_position, 40.0)
     #(@game.level > 3) ? 100.0 : (@game.level * 20.0))
     #@camera.lookat(gl, @game.player_position, 100.9)
     #(@game.level > 3) ? 190.0 : (@game.level * 20.0))
@@ -156,7 +156,7 @@ class GameEngine
 
   def self.start(gl, distance, cube, shapes, batcher, shape_batchers, starting_level = 1, direction = :level_up)
     @start_game_proc ||= Proc.new { |maze_level, direction_inner|
-      @camera = GameCamera.new
+      @camera = GameCamera.new(0.7, 4.0)
       @game = self.new(distance, maze_level, cube, shapes, batcher, shape_batchers, direction_inner)
       if maze_level > 0
         gl.emit({"mkmaze" => @game.level})
@@ -547,7 +547,7 @@ class GameEngine
   end
 
   def draw_twod(gl)
-    gl.label(game_status)
+    #gl.label(game_status)
   end
 
   def game_status
