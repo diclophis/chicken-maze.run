@@ -21,7 +21,7 @@ uniform vec4 colDiffuse;
 out vec4 finalColor;
 #endif
 
-#define     MAX_LIGHTS              4
+#define     MAX_LIGHTS              1
 #define     LIGHT_DIRECTIONAL       0
 #define     LIGHT_POINT             1
 #define     LIGHT_SPOT              2
@@ -96,9 +96,14 @@ vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
 vec3 ComputeLightDirectional(Light l, vec3 n, vec3 s)
 {
-    vec3 lightDir = -normalize(l.target - l.position);
-    float diff = clamp(float(dot(n, lightDir)), 0.0, 1.0)*l.intensity;
-    return (diff * l.color.rgb);
+    return -normalize(l.target - l.position);
+
+    //TODO: this is broken below
+    //vec3 lightDir = -normalize(l.target - l.position);
+    //float diff = l.intensity;
+    ////clamp(float(dot(n, lightDir)), 0.0, 1.0)*l.intensity;
+    //return (diff * l.color.rgb);
+    ////light = -normalize(lights[i].target - lights[i].position);
 }
 
 
@@ -155,8 +160,8 @@ void main()
 
             if (lights[i].type == LIGHT_DIRECTIONAL)
             {
-              //light = ComputeLightDirectional(lights[i], normal, specular);
-              light = -normalize(lights[i].target - lights[i].position);
+              light = ComputeLightDirectional(lights[i], normal, specular);
+              //light = -normalize(lights[i].target - lights[i].position);
             }
        
             if (lights[i].type == LIGHT_POINT)
@@ -179,14 +184,13 @@ void main()
             lightDot += lights[i].color.rgb*NdotL;
 
             float specCo = 0.0;
-            if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewDir, reflect(-(light), normal))), 16.0); // 16 refers to shine
+            if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewDir, reflect(-(light), normal))), 8.0); // 16 refers to shine
             specular += specCo;
         }
     }
 
     //finalColor = (((colDiffuse + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
     //finalColor = pow(finalColor, vec4(1.0/2.2));
-
     //finalColor = vec4(1.0, 1.0, 1.0, 1.0);
 
     finalColor = (texelColor*((colDiffuse + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
