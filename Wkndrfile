@@ -534,16 +534,17 @@ class GameEngine
     @cube.deltas(0.125, 0.125, 0.125)
     @cube.next #@cube.draw(false)
 
-    #TODO
-    #@players.each { |key, rpv|
-    #  player_position, player_velocity = *rpv
-    #  @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
-    #  @cube.deltap(*player_position)
-    #  @cube.deltas(0.125, 0.125, 0.125)
-    #  @cube.next #@cube.draw(false)
-    #}
-
     @batcher.draw(@cube.current_shape)
+
+    #TODO
+    @players.each { |key, rpv|
+      player_position, player_velocity = *rpv
+      @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
+      @cube.deltap(*player_position)
+      @cube.deltas(0.125, 0.125, 0.125)
+      @cube.next #@cube.draw(false)
+      @batcher.draw(@cube.current_shape)
+    }
   end
 
   def draw_twod(gl)
@@ -576,15 +577,15 @@ Wkndr.nonce {
   Wkndr.client_side { |gl|
     gl.open_default_view!
 
-    distance = 8
+    distance = 16
     a = (((distance) * 2) + 1)
     b = a * a
 
     store = {}
     chicken_model = Model.new(gl, "resources/chicken.glb", 0.125)
 
-    @batcher = CubicBatchingSystem.new(store, chicken_model, 1)
-    @proxy = ShapeProxy.new(@batcher, 1)
+    @batcher = CubicBatchingSystem.new(store, chicken_model, 32)
+    @proxy = ShapeProxy.new(@batcher, 32)
 
     shape_batchers = {}
     shapes = {}
