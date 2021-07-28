@@ -26,10 +26,10 @@ spec:
         resources:
           limits:
             memory: 1024M
-            cpu: 100m
+            cpu: 50m
           requests:
             memory: 100M
-            cpu: 100m
+            cpu: 10m
         volumeMounts: []
       - name: mkmaze
         image: chicken-maze.run:latest
@@ -38,10 +38,10 @@ spec:
         resources:
           limits:
             memory: 1024M
-            cpu: 100m
+            cpu: 50m
           requests:
             memory: 100M
-            cpu: 100m
+            cpu: 10m
         volumeMounts: []
 
 
