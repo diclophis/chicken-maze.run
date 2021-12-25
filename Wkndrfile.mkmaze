@@ -3365,29 +3365,37 @@ module Theseus
   end
 end
 
-Wkndr.nonce {
-  Wkndr.client_side { |gl|
-    #gl.open_default_view!
-  }
+#Wkndr.nonce {
+#  Wkndr.client_side { |gl|
+#    #gl.open_default_view!
+#  }
+#}
+
+Wkndr.server_side("mkmaze") { |gl, server|
+  server.wsb("/")
 }
 
-Wkndr.client_side { |gl|
+Wkndr.client_side("mkmaze") { |gl|
+  #log!(:maze_client_side)
 
-log!(:maze_client_size)
+  gl.event("mkmaze") { |channel, msg|
+    #log!(:BAPBAPBAP, channel, msg)
 
-  gl.event { |channel, msg|
-    #log!(channel, msg)
+#[:FOOOO, "mkmaze", 1, nil, #<Proc:0x55caab044bf0>, nil]                                                               
+#[1, nil] 
 
     case channel
       when "mkmaze"
         srand(msg.to_i)
+
+        #log!(:GENMAZE, msg.to_i)
 
         braid = rand * 100.0
         weave = 0 #TODO
         sparse = rand * 100.0
         randomness = rand * 100.0
         maze_s = (msg.to_i * msg.to_i)
-        exit = [maze_s, maze_s-1]
+        exit_pos = [maze_s, maze_s-1]
 
         # generate a orthogonal maze
         maze = Theseus::OrthogonalMaze.generate({
@@ -3398,7 +3406,7 @@ log!(:maze_client_size)
           :weave => weave,
           :sparse => sparse,
           :randomness => randomness,
-          :exit => exit
+          :exit => exit_pos
         })
 
         out = []
@@ -3409,7 +3417,8 @@ log!(:maze_client_size)
           }
         }
 
-        gl.emit({"maze" => [msg.to_i, maze_s, exit, out]})
+        gl.emit({"maze" => [msg.to_i, maze_s, exit_pos, out]})
+        #log!(:SENTMAZE, msg.to_i)
     end
   }
 }

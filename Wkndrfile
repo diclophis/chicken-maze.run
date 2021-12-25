@@ -159,7 +159,7 @@ class GameEngine
       @camera = GameCamera.new(0.7, 4.0)
       @game = self.new(distance, maze_level, cube, shapes, batcher, shape_batchers, direction_inner)
       if maze_level > 0
-        log!(:mkmaze, @game.level)
+        #log!(:mkmaze, @game.level)
 
         gl.emit({"mkmaze" => @game.level})
       end
@@ -168,13 +168,15 @@ class GameEngine
   end
 
   def self.event(channel, msg)
-    log!(channel, msg)
+    #log!(:WTFWTFWTF, channel, msg)
 
     if @game
       case channel
         when "position"
           @game.track_other_players!(msg)
         when "maze"
+          #log!(channel, msg)
+
           @game.load_maze!(*msg)
       end
     end
@@ -203,6 +205,8 @@ class GameEngine
     @last_global_time = global_time
     @ticks += 1
 
+    #raise "shutdown" if global_time > 10
+
     @shaped = (global_time * 0.1).to_i % 15
 
     #return unless @maze
@@ -223,6 +227,8 @@ class GameEngine
     allow_down = false
     allow_left = false
     allow_right = false
+
+    #gl.mousep { |xyl| log!(:SHUTDOWN) }
 
     arrow_keys = gl.keyspressed(KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN)
     speed = 0.1
@@ -466,8 +472,11 @@ class GameEngine
       #  player_velocity[2] += (player_velocity[2] * -1.0) * friction
       #end
 
-      player_position[0] += (player_velocity[0] * delta_time * 0.5)
-      player_position[2] += (player_velocity[2] * delta_time * 0.5)
+      nnx = player_position[0] + (player_velocity[0] * delta_time)
+      nny = player_position[2] + (player_velocity[2] * delta_time)
+
+      player_position[0] -= (player_position[0] - nnx) * 0.5 #(player_velocity[0] * delta_time * 0.5)
+      player_position[2] -= (player_position[2] - nny) * 0.5 #(player_velocity[2] * delta_time * 0.5)
     }
 
     if @time_since_last_hop > hop_timeout
@@ -568,6 +577,8 @@ class GameEngine
   def track_other_players!(msg)
     player_updated = msg.keys
     player_updated.each { |player|
+      next if player == $HEX
+
       maze_level, player_position, player_velocity = msg[player]
 
       if @maze_level == maze_level
@@ -577,9 +588,11 @@ class GameEngine
   end
 end
 
-Wkndr.nonce {
-  Wkndr.client_side { |gl|
+Wkndr.nonce("chicken") {
+  Wkndr.client_side("chicken") { |gl|
     gl.open_default_view!
+
+    #log!(:FOOONCE)
 
     distance = 16
     a = (((distance) * 2) + 1)
@@ -607,3 +620,4 @@ Wkndr.nonce {
 }
 
 Wkndr.run(GameEngine)
+
