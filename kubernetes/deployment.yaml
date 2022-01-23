@@ -26,10 +26,10 @@ spec:
         resources:
           limits:
             memory: 1024M
-            cpu: 100m
+            cpu: 50m
           requests:
             memory: 100M
-            cpu: 100m
+            cpu: 10m
         volumeMounts: []
       #- name: mkmaze
       #  image: chicken-maze.run:latest
@@ -42,6 +42,18 @@ spec:
       #    requests:
       #      memory: 100M
       #      cpu: 100m
+      #  volumeMounts: []
+      #- name: mkmaze
+      #  image: chicken-maze.run:latest
+      #  imagePullPolicy: IfNotPresent
+      #  command: ["/var/lib/wkndr/release/wkndr.mruby", "--no-server", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
+      #  resources:
+      #    limits:
+      #      memory: 1024M
+      #      cpu: 50m
+      #    requests:
+      #      memory: 100M
+      #      cpu: 10m
       #  volumeMounts: []
 
 
