@@ -112,7 +112,6 @@ class GameEngine
     @lin_y2 = 0.0
 
     @maze_draw_distance = distance
-    @maze_draw_distance_h = 0 #@maze_draw_distance / 2
 
     @cool_down = [99, 99]
 
@@ -131,7 +130,7 @@ class GameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
-    @camera.update(gl, global_time, delta_time, 1.5, @game.player_position)
+    @camera.update(gl, global_time, delta_time, 1.77, @game.player_position)
 
     case @game.update(gl, global_time, delta_time)
       when :level_up
@@ -142,7 +141,7 @@ class GameEngine
   end
 
   def self.draw_threed(gl)
-    @camera.lookat(gl, @game.player_position, 40.0)
+    @camera.lookat(gl, @game.player_position, 63.0)
     #(@game.level > 3) ? 100.0 : (@game.level * 20.0))
     #@camera.lookat(gl, @game.player_position, 100.9)
     #(@game.level > 3) ? 190.0 : (@game.level * 20.0))
@@ -498,11 +497,11 @@ class GameEngine
     if @maze_level > 0
       if @maze && @px && @py
         ((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
-          ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
+          ((@py-(@maze_draw_distance))..(@py+@maze_draw_distance)).each do |y|
             if x>=0 && x<@maze_s && y>=0 && y<@maze_s
-              a = Math.atan2(y - @py, x - @px)
-              deg = (a * (180.0 / 3.1457))
-              if (@camera_angle - deg).abs < 100.0 || ((@px - x).abs < 2) && ((@py - y).abs < 2)
+              #a = Math.atan2(y - @py, x - @px)
+              #deg = (a * (180.0 / 3.1457))
+              #if (@camera_angle - deg).abs < 100.0 || ((@px - x).abs < 2) && ((@py - y).abs < 2)
                 cell = @maze[x][y]
                 unless cell == 0
                   primary = (cell & PRIMARY)
@@ -513,17 +512,18 @@ class GameEngine
                     shape.next #draw(false)
                   end
                 end
-              end
+              #end
             end
           end
         end
       end
     else
       ((@px-(@maze_draw_distance))..(@px+@maze_draw_distance)).each do |x|
-        ((@py-(@maze_draw_distance) + @maze_draw_distance_h)..(@py+@maze_draw_distance) + @maze_draw_distance_h).each do |y|
-          a = Math.atan2(y - @py, x - @px)
-          deg = (a * (180.0 / 3.1457))
-          if (@camera_angle - deg).abs < 100.0 || ((@px - x).abs < 2) && ((@py - y).abs < 2)
+        ((@py-(@maze_draw_distance))..(@py+@maze_draw_distance)).each do |y|
+          #a = Math.atan2(y - @py, x - @px)
+          #deg = (a * (180.0 / 3.1457))
+          #if (@camera_angle - deg).abs < 100.0 || ((@px - x).abs < 2) && ((@py - y).abs < 2)
+          #if ((@px - x).abs < 2) && ((@py - y).abs < 2)
             shape = @shapes[0]
             shape.deltar(0.0, 1.0, 0.0, 0.0)
             shape.deltap(x, -0.125, y)
@@ -532,7 +532,7 @@ class GameEngine
             #shape.deltap(x * 10.0, -0.125 * 14.0, y * 10.0)
             #shape.deltas(10.0, 10.0, 10.0)
             shape.next #draw(false)
-          end
+          #end
         end
       end
     end
@@ -594,7 +594,7 @@ Wkndr.nonce("chicken") {
 
     #log!(:FOOONCE)
 
-    distance = 16
+    distance = 4
     a = (((distance) * 2) + 1)
     b = a * a
 
@@ -621,3 +621,6 @@ Wkndr.nonce("chicken") {
 
 Wkndr.run(GameEngine)
 
+Wkndr.server_side("mkmaze") { |gl, server|
+  server.wsb("/")
+}

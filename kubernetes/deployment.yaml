@@ -20,7 +20,7 @@ spec:
       - name: main
         image: chicken-maze.run:latest
         imagePullPolicy: IfNotPresent
-        command: ["/var/lib/wkndr/release/wkndr.mruby", "--server=/var/lib/wkndr/public", "--no-client"]
+        command: ["/var/lib/wkndr/release/wkndr.mruby", "--server=/var/lib/wkndr/public", "--client=-1x-1", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
         ports:
         - containerPort: 8000
         resources:
@@ -31,18 +31,18 @@ spec:
             memory: 100M
             cpu: 100m
         volumeMounts: []
-      - name: mkmaze
-        image: chicken-maze.run:latest
-        imagePullPolicy: IfNotPresent
-        command: ["/var/lib/wkndr/release/wkndr.mruby", "--no-server", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
-        resources:
-          limits:
-            memory: 1024M
-            cpu: 100m
-          requests:
-            memory: 100M
-            cpu: 100m
-        volumeMounts: []
+      #- name: mkmaze
+      #  image: chicken-maze.run:latest
+      #  imagePullPolicy: IfNotPresent
+      #  command: ["/var/lib/wkndr/release/wkndr.mruby", "--no-server", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
+      #  resources:
+      #    limits:
+      #      memory: 1024M
+      #      cpu: 100m
+      #    requests:
+      #      memory: 100M
+      #      cpu: 100m
+      #  volumeMounts: []
 
 
 ---

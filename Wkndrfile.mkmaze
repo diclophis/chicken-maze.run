@@ -3371,10 +3371,6 @@ end
 #  }
 #}
 
-Wkndr.server_side("mkmaze") { |gl, server|
-  server.wsb("/")
-}
-
 Wkndr.client_side("mkmaze") { |gl|
   #log!(:maze_client_side)
 

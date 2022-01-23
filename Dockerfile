@@ -16,3 +16,5 @@ RUN /var/lib/wkndr/simple-cp.sh
 #RUN /var/lib/wkndr/iterate-server.sh
 
 RUN ls -lh /var/lib/wkndr/release/wkndr.mruby /var/lib/wkndr/public
+
+CMD ["/var/lib/wkndr/release/wkndr.mruby", "--server=/var/lib/wkndr/public", "--and-client", "--client=-1x-1", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
