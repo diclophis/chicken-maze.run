@@ -1,11 +1,11 @@
 # vi:syntax=ruby
 
 class ShapeProxy
-  def initialize(batcher, count)
+  def initialize(gl, batcher, count)
     @count = count
     @xhapes = []
     @count.times { |i|
-      @xhapes << batcher.at(i)
+      @xhapes << batcher.at(gl, i)
     }
 
     reset
@@ -602,7 +602,7 @@ Wkndr.nonce("chicken") {
     chicken_model = Model.new(gl, "resources/chicken.glb", 0.125)
 
     @batcher = CubicBatchingSystem.new(store, chicken_model, 32)
-    @proxy = ShapeProxy.new(@batcher, 32)
+    @proxy = ShapeProxy.new(gl, @batcher, 32)
 
     shape_batchers = {}
     shapes = {}
@@ -611,7 +611,7 @@ Wkndr.nonce("chicken") {
       shape_file = "resources/maze-#{i}.glb"
       m = Model.new(gl, shape_file, 1.0)
       batcher = CubicBatchingSystem.new(@store, m, b)
-      shapes[i] = ShapeProxy.new(batcher, b)
+      shapes[i] = ShapeProxy.new(gl, batcher, b)
       shape_batchers[i] = batcher
     }
 

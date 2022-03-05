@@ -3372,19 +3372,10 @@ end
 #}
 
 Wkndr.client_side("mkmaze") { |gl|
-  #log!(:maze_client_side)
-
   gl.event("mkmaze") { |channel, msg|
-    #log!(:BAPBAPBAP, channel, msg)
-
-#[:FOOOO, "mkmaze", 1, nil, #<Proc:0x55caab044bf0>, nil]                                                               
-#[1, nil] 
-
     case channel
       when "mkmaze"
         srand(msg.to_i)
-
-        #log!(:GENMAZE, msg.to_i)
 
         braid = rand * 100.0
         weave = 0 #TODO
@@ -3414,7 +3405,7 @@ Wkndr.client_side("mkmaze") { |gl|
         }
 
         gl.emit({"maze" => [msg.to_i, maze_s, exit_pos, out]})
-        #log!(:SENTMAZE, msg.to_i)
+
     end
   }
 }
