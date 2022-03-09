@@ -21,7 +21,7 @@
  </filter>
 
  <filter name="Subdivision Surfaces: Midpoint">
-  <Param value="1" isxmlparam="0" type="RichInt" name="Iterations" tooltip="Number of time the model is subdivided." description="Iterations"/>
+  <Param value="2" isxmlparam="0" type="RichInt" name="Iterations" tooltip="Number of time the model is subdivided." description="Iterations"/>
   <Param value="0.0" max="2.0" isxmlparam="0" type="RichAbsPerc" min="0" name="Threshold" tooltip="All the edges &lt;b>longer&lt;/b> than this threshold will be refined.&lt;br>Setting this value to zero will force an uniform refinement." description="Edge Threshold"/>
   <Param value="false" isxmlparam="0" type="RichBool" name="Selected" tooltip="If selected the filter affect only the selected faces" description="Affect only selected faces"/>
  </filter>
@@ -35,15 +35,23 @@
   <Param value="true" tooltip="Only works for per-vertex AO. In order to use GPU-Mode, your hardware must support FBOs, FP32 Textures and Shaders. Normally increases the performance by a factor of 4x-5x" name="useGPU" isxmlparam="0" type="RichBool" description="Use GPU acceleration"/>
   <Param value="2048" tooltip="Defines the depth texture size used to compute occlusion from each point of view. Higher values means better accuracy usually with low impact on performance" name="depthTexSize" isxmlparam="0" type="RichInt" description="Depth texture size(should be 2^n)"/>
  </filter>
-
  <filter name="Transfer Color: Vertex to Face"/>
 
+<!--
+ <filter name="Per Face Quality according to Triangle shape and aspect ratio">
+  <Param tooltip="Choose a metric to compute triangle quality." isxmlparam="0" name="Metric" value="1" type="RichEnum" enum_val1="inradius/circumradius" enum_val4="Texture Angle Distortion" enum_val5="Texture Area Distortion" enum_val7="Polygonal planarity (relative)" description="Metric:" enum_val3="Area" enum_val6="Polygonal planarity (max)" enum_cardinality="8" enum_val2="Mean ratio" enum_val0="area/max side"/>
+ </filter>
+
+ <filter name="Transfer Color: Face to Vertex"/>
+-->
+
+
  <filter name="Smooth: Laplacian Face Color">
-  <Param type="RichInt" tooltip="the number of iteration of the smoothing algorithm" name="iteration" value="2" isxmlparam="0" description="Iteration"/>
+  <Param type="RichInt" tooltip="the number of iteration of the smoothing algorithm" name="iteration" value="4" isxmlparam="0" description="Iteration"/>
  </filter>
 
  <filter name="Smooth: Laplacian Vertex Color">
-  <Param type="RichInt" tooltip="the number of iteration of the smoothing algorithm" name="iteration" description="Iteration" isxmlparam="0" value="2"/>
+  <Param type="RichInt" tooltip="the number of iteration of the smoothing algorithm" name="iteration" description="Iteration" isxmlparam="0" value="4"/>
  </filter>
 
 <!--
