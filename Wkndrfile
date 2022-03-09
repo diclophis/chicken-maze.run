@@ -168,7 +168,7 @@ class GameEngine
   end
 
   def self.event(channel, msg)
-    log!(:WTFWTFWTF, channel, msg)
+    #log!(:WTFWTFWTF, channel, msg)
 
     if @game
       case channel

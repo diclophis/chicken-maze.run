@@ -26,13 +26,52 @@
   <Param value="false" isxmlparam="0" type="RichBool" name="Selected" tooltip="If selected the filter affect only the selected faces" description="Affect only selected faces"/>
  </filter>
 
+ <filter name="Ambient Occlusion">
+  <Param value="0" tooltip="Occlusion may be calculated per-vertex or per-face, color and quality will be saved in the chosen component." name="occMode" isxmlparam="0" enum_val1="per-Face (deprecated)" enum_cardinality="2" enum_val0="per-Vertex" type="RichEnum" description="Occlusion mode:"/>
+  <Param value="0.25" tooltip="The balance between a uniform and a directionally biased set of lighting direction&lt;br>: - 0 means light came only uniformly from any direction&lt;br> - 1 means that all the light cames from the specified cone of directions &lt;br> - other values mix the two set of lighting directions " name="dirBias" isxmlparam="0" type="RichFloat" description="Directional Bias [0..1]"/>
+  <Param value="512" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time" name="reqViews" isxmlparam="0" type="RichInt" description="Requested views"/>
+  <Param x="0.6135" y="0.576" tooltip="Number of different views placed around the mesh. More views means better accuracy at the cost of increased calculation time" name="coneDir" isxmlparam="0" z="0.33" type="RichPoint3f" description="Lighting Direction"/>
+  <Param value="256" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time" name="coneAngle" isxmlparam="0" type="RichFloat" description="Cone amplitude"/>
+  <Param value="true" tooltip="Only works for per-vertex AO. In order to use GPU-Mode, your hardware must support FBOs, FP32 Textures and Shaders. Normally increases the performance by a factor of 4x-5x" name="useGPU" isxmlparam="0" type="RichBool" description="Use GPU acceleration"/>
+  <Param value="2048" tooltip="Defines the depth texture size used to compute occlusion from each point of view. Higher values means better accuracy usually with low impact on performance" name="depthTexSize" isxmlparam="0" type="RichInt" description="Depth texture size(should be 2^n)"/>
+ </filter>
+
+ <filter name="Transfer Color: Vertex to Face"/>
+
+ <filter name="Smooth: Laplacian Face Color">
+  <Param type="RichInt" tooltip="the number of iteration of the smoothing algorithm" name="iteration" value="2" isxmlparam="0" description="Iteration"/>
+ </filter>
+
+ <filter name="Smooth: Laplacian Vertex Color">
+  <Param type="RichInt" tooltip="the number of iteration of the smoothing algorithm" name="iteration" description="Iteration" isxmlparam="0" value="2"/>
+ </filter>
+
+<!--
+ <filter name="Simplification: Quadric Edge Collapse Decimation">
+  <Param type="RichInt" tooltip="The desired final number of faces." value="333" name="TargetFaceNum" description="Target number of faces" isxmlparam="0"/>
+  <Param type="RichFloat" tooltip="If non zero, this parameter specifies the desired final size of the mesh as a percentage of the initial size." value="0" name="TargetPerc" description="Percentage reduction (0..1)" isxmlparam="0"/>
+  <Param type="RichFloat" tooltip="Quality threshold for penalizing bad shaped faces.&lt;br>The value is in the range [0..1]&#xa; 0 accept any kind of face (no penalties),&#xa; 0.5  penalize faces with quality &lt; 0.5, proportionally to their shape&#xa;" value="0.3" name="QualityThr" description="Quality threshold" isxmlparam="0"/>
+  <Param type="RichBool" tooltip="The simplification process tries to do not affect mesh boundaries during simplification" value="true" name="PreserveBoundary" description="Preserve Boundary of the mesh" isxmlparam="0"/>
+  <Param type="RichFloat" tooltip="The importance of the boundary during simplification. Default (1.0) means that the boundary has the same importance of the rest. Values greater than 1.0 raise boundary importance and has the effect of removing less vertices on the border. Admitted range of values (0,+inf). " value="5.0" name="BoundaryWeight" description="Boundary Preserving Weight" isxmlparam="0"/>
+  <Param type="RichBool" tooltip="Try to avoid face flipping effects and try to preserve the original orientation of the surface" value="false" name="PreserveNormal" description="Preserve Normal" isxmlparam="0"/>
+  <Param type="RichBool" tooltip="Avoid all the collapses that should cause a topology change in the mesh (like closing holes, squeezing handles, etc). If checked the genus of the mesh should stay unchanged." value="true" name="PreserveTopology" description="Preserve Topology" isxmlparam="0"/>
+  <Param type="RichBool" tooltip="Each collapsed vertex is placed in the position minimizing the quadric error.&#xa; It can fail (creating bad spikes) in case of very flat areas. &#xa;If disabled edges are collapsed onto one of the two original vertices and the final mesh is composed by a subset of the original vertices. " value="false" name="OptimalPlacement" description="Optimal position of simplified vertices" isxmlparam="0"/>
+  <Param type="RichBool" tooltip="Add additional simplification constraints that improves the quality of the simplification of the planar portion of the mesh, as a side effect, more triangles will be preserved in flat areas (allowing better shaped triangles)." value="false" name="PlanarQuadric" description="Planar Simplification" isxmlparam="0"/>
+  <Param type="RichFloat" tooltip="How much we should try to preserve the triangles in the planar regions. If you lower this value planar areas will be simplified more." value="0.001" name="PlanarWeight" description="Planar Simp. Weight" isxmlparam="0"/>
+  <Param type="RichBool" tooltip="Use the Per-Vertex quality as a weighting factor for the simplification. The weight is used as a error amplification value, so a vertex with a high quality value will not be simplified and a portion of the mesh with low quality values will be aggressively simplified." value="false" name="QualityWeight" description="Weighted Simplification" isxmlparam="0"/>
+  <Param type="RichBool" tooltip="After the simplification an additional set of steps is performed to clean the mesh (unreferenced vertices, bad faces, etc)" value="true" name="AutoClean" description="Post-simplification cleaning" isxmlparam="0"/>
+  <Param type="RichBool" tooltip="The simplification is applied only to the selected set of faces.&#xa; Take care of the target number of faces!" value="false" name="Selected" description="Simplify only selected faces" isxmlparam="0"/>
+ </filter>
+-->
+
+
 <!--
  <filter name="Re-Orient all faces coherentely"/>
 -->
 
 <!--
  <filter name="Merge Close Vertices">
-  <Param max="0.1" isxmlparam="0" description="Merging distance" value="0.000125" name="Threshold" tooltip="All the vertices that closer than this threshold are merged together. Use very small values, default values is 1/10000 of bounding box diagonal. " min="0" type="RichAbsPerc"/>
+  <Param max="0.1" isxmlparam="0" description="Merging distance" value="0.00125" name="Threshold" tooltip="All the vertices that closer than this threshold are merged together. Use very small values, default values is 1/10000 of bounding box diagonal. " min="0" type="RichAbsPerc"/>
  </filter>
 
  <filter name="Normalize Vertex Normals"/>
@@ -93,9 +132,6 @@
 -->
 
 <!--
- <filter name="Merge Close Vertices">
-  <Param max="0.1" isxmlparam="0" description="Merging distance" value="0.005" name="Threshold" tooltip="All the vertices that closer than this threshold are merged together. Use very small values, default values is 1/10000 of bounding box diagonal. " min="0" type="RichAbsPerc"/>
- </filter>
 -->
 
  <filter name="Re-Compute Face Normals"/>
@@ -104,5 +140,17 @@
   <Param name="condSelect" value="(y1 &lt; 0.0001) &amp;&amp; (y2 &lt; 0.0001) &amp;&amp; (y0 &lt; 0.0001)" description="boolean function" isxmlparam="0" type="RichString" tooltip="type a boolean function that will be evaluated in order to select a subset of faces&lt;br>"/>
  </filter>
  <filter name="Delete Selected Faces"/>
+
+<!--
+ <filter name="Volumetric obscurance">
+  <Param isxmlparam="0" name="onPrimitive" description="Metric:" value="0" tooltip="Choose whether to trace rays from faces or from vertices. " enum_val0="On vertices" enum_cardinality="2" type="RichEnum" enum_val1="On Faces"/>
+  <Param isxmlparam="0" name="numberRays" description="Number of rays: " value="512" tooltip="The number of rays that will be casted around the normals." type="RichInt"/>
+  <Param isxmlparam="0" name="DepthTextureSize" description="Depth texture size" value="4096" tooltip="Size of the depth texture for depth peeling. Higher resolutions provide better sampling of the mesh, with a small performance penalty." type="RichInt"/>
+  <Param isxmlparam="0" name="peelingIteration" description="Peeling Iteration" value="32" tooltip="Number of depth peeling iteration. Actually is the maximum number of layers that a ray can hit while traversing the mesh. For example, in the case of a sphere, you should specify 2 in this parameter. For a torus, specify 4. &lt;b>For more complex geometry you should run the depth complexity filter to know the exact value&lt;/b>." type="RichInt"/>
+  <Param isxmlparam="0" name="peelingTolerance" description="Peeling Tolerance" value="0.001" tooltip="Depth tolerance used during depth peeling. This is the threshold used to differentiate layers between each others.Two elements whose distance is below this value will be considered as belonging to the same layer." type="RichFloat"/>
+  <Param isxmlparam="0" name="coneAngle" description="Cone amplitude" value="100" tooltip="Cone amplitude around normals in degrees. Rays are traced within this cone." type="RichFloat"/>
+  <Param isxmlparam="0" name="obscuranceExponent" description="Obscurance Exponent" value="0.1" tooltip="This parameter controls the spatial decay term in the obscurance formula. The greater the exponent, the greater the influence of distance; that is: even if a ray is blocked by an occluder its contribution to the obscurance term is non zero, but proportional to this parameter. It turs out that if you choose a value of zero, you get the standard ambient occlusion term. &lt;b>(In this case, only a value of two, in the peeling iteration parameter, has a sense)&lt;/b>" type="RichFloat"/>
+ </filter>
+-->
 
 </FilterScript>
