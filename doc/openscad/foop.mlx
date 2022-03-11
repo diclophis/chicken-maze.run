@@ -1,5 +1,10 @@
 <!DOCTYPE FilterScript>
 <FilterScript>
+ <filter name="Subdivision Surfaces: Midpoint">
+  <Param tooltip="Number of time the model is subdivided." type="RichInt" name="Iterations" isxmlparam="0" value="3" description="Iterations"/>
+  <Param tooltip="All the edges &lt;b>longer&lt;/b> than this threshold will be refined.&lt;br>Setting this value to zero will force an uniform refinement." max="1.41973" type="RichAbsPerc" name="Threshold" isxmlparam="0" value="0.014197" description="Edge Threshold" min="0"/>
+  <Param tooltip="If selected the filter affect only the selected faces" type="RichBool" name="Selected" isxmlparam="0" value="false" description="Affect only selected faces"/>
+ </filter>
  <filter name="Transform: Rotate">
   <Param enum_val0="X axis" enum_val1="Y axis" enum_cardinality="4" enum_val2="Z axis" enum_val3="custom axis" type="RichEnum" value="0" name="rotAxis"/>
   <Param enum_val0="origin" enum_val1="barycenter" enum_cardinality="3" enum_val2="custom point" type="RichEnum" value="0" name="rotCenter"/>
@@ -15,20 +20,12 @@
  <filter name="Re-Compute Face Normals"/>
 
 
- <filter name="Colorize curvature (APSS)">
-  <Param tooltip="If checked, only selected vertices will be projected." isxmlparam="0" type="RichBool" description="Selection only" value="false" name="SelectionOnly"/>
-  <Param tooltip="Scale of the spatial low pass filter.&#xa;It is relative to the radius (local point spacing) of the vertices." isxmlparam="0" type="RichFloat" description="MLS - Filter scale" value="2" name="FilterScale"/>
-  <Param tooltip="Threshold value used to stop the projections.&#xa;This value is scaled by the mean point spacing to get the actual threshold." isxmlparam="0" type="RichFloat" description="Projection - Accuracy (adv)" value="0.0001" name="ProjectionAccuracy"/>
-  <Param tooltip="Max number of iterations for the projection." isxmlparam="0" type="RichInt" description="Projection - Max iterations (adv)" value="15" name="MaxProjectionIters"/>
-  <Param tooltip="Control the curvature of the fitted spheres: 0 is equivalent to a pure plane fit,1 to a pure spherical fit, values between 0 and 1 gives intermediate results,while other real values might give interesting results, but take care with extremesettings !" isxmlparam="0" type="RichFloat" description="MLS - Spherical parameter" value="1" name="SphericalParameter"/>
-  <Param enum_cardinality="5" enum_val0="Mean" tooltip="The type of the curvature to plot.&lt;br>ApproxMean uses the radius of the fitted sphere as an approximation of the mean curvature." isxmlparam="0" enum_val1="Gauss" type="RichEnum" description="Curvature type" enum_val3="K2" enum_val4="ApproxMean" value="0" enum_val2="K1" name="CurvatureType"/>
- </filter>
-
  <filter name="Conditional Face Selection">
   <Param name="condSelect" value="(y1 &lt; 0.0001) &amp;&amp; (y2 &lt; 0.0001) &amp;&amp; (y0 &lt; 0.0001)" description="boolean function" isxmlparam="0" type="RichString" tooltip="type a boolean function that will be evaluated in order to select a subset of faces&lt;br>"/>
  </filter>
  <filter name="Delete Selected Faces"/>
 
+<!--
  <filter name="Parametrization: Trivial Per-Triangle">
   <Param tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation" isxmlparam="0" type="RichInt" description="Quads per line" value="0" name="sidedim"/>
   <Param tooltip="Gives an indication on how big the texture is" isxmlparam="0" type="RichInt" description="Texture Dimension (px)" value="1024" name="textdim"/>
@@ -42,5 +39,36 @@
   <Param tooltip="if current mesh has a texture will be overwritten (with provided texture dimension)" isxmlparam="0" type="RichBool" description="Overwrite texture" value="false" name="overwrite"/>
   <Param tooltip="assign the newly created texture" isxmlparam="0" type="RichBool" description="Assign texture" value="false" name="assign"/>
   <Param tooltip="if enabled the unmapped texture space is colored using a pull push filling algorithm, if false is set to black" isxmlparam="0" type="RichBool" description="Fill texture" value="true" name="pullpush"/>
+ </filter>
+-->
+
+ <filter name="Volumetric obscurance">
+  <Param description="Metric:" type="RichEnum" value="0" tooltip="Choose whether to trace rays from faces or from vertices. " name="onPrimitive" enum_cardinality="2" enum_val0="On vertices" enum_val1="On Faces" isxmlparam="0"/>
+  <Param description="Number of rays: " type="RichInt" value="256" tooltip="The number of rays that will be casted around the normals." name="numberRays" isxmlparam="0"/>
+  <Param description="Depth texture size" type="RichInt" value="1024" tooltip="Size of the depth texture for depth peeling. Higher resolutions provide better sampling of the mesh, with a small performance penalty." name="DepthTextureSize" isxmlparam="0"/>
+  <Param description="Peeling Iteration" type="RichInt" value="10" tooltip="Number of depth peeling iteration. Actually is the maximum number of layers that a ray can hit while traversing the mesh. For example, in the case of a sphere, you should specify 2 in this parameter. For a torus, specify 4. &lt;b>For more complex geometry you should run the depth complexity filter to know the exact value&lt;/b>." name="peelingIteration" isxmlparam="0"/>
+  <Param description="Peeling Tolerance" type="RichFloat" value="1e-07" tooltip="Depth tolerance used during depth peeling. This is the threshold used to differentiate layers between each others.Two elements whose distance is below this value will be considered as belonging to the same layer." name="peelingTolerance" isxmlparam="0"/>
+  <Param description="Cone amplitude" type="RichFloat" value="120" tooltip="Cone amplitude around normals in degrees. Rays are traced within this cone." name="coneAngle" isxmlparam="0"/>
+  <Param description="Obscurance Exponent" type="RichFloat" value="0.1" tooltip="This parameter controls the spatial decay term in the obscurance formula. The greater the exponent, the greater the influence of distance; that is: even if a ray is blocked by an occluder its contribution to the obscurance term is non zero, but proportional to this parameter. It turs out that if you choose a value of zero, you get the standard ambient occlusion term. &lt;b>(In this case, only a value of two, in the peeling iteration parameter, has a sense)&lt;/b>" name="obscuranceExponent" isxmlparam="0"/>
+ </filter>
+
+ <filter name="Smooth: Laplacian Vertex Color">
+  <Param tooltip="the number of iteration of the smoothing algorithm" type="RichInt" name="iteration" isxmlparam="0" value="1" description="Iteration"/>
+ </filter>
+
+ <filter name="Parametrization: Trivial Per-Triangle">
+  <Param description="Quads per line" isxmlparam="0" value="0" name="sidedim" type="RichInt" tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation"/>
+  <Param description="Texture Dimension (px)" isxmlparam="0" value="1024" name="textdim" type="RichInt" tooltip="Gives an indication on how big the texture is"/>
+  <Param description="Inter-Triangle border (px)" isxmlparam="0" value="2" name="border" type="RichInt" tooltip="Specifies how many pixels to be left between triangles in parametrization domain"/>
+  <Param enum_val0="Basic" description="Method" enum_val1="Space-optimizing" isxmlparam="0" value="1" name="method" type="RichEnum" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain" enum_cardinality="2"/>
+ </filter>
+
+ <filter name="Transfer: Vertex Color to Texture">
+  <Param description="Texture file" isxmlparam="0" value="shape-0_tex.png" name="textName" type="RichString" tooltip="The texture file to be created"/>
+  <Param description="Texture width (px)" isxmlparam="0" value="1024" name="textW" type="RichInt" tooltip="The texture width"/>
+  <Param description="Texture height (px)" isxmlparam="0" value="1024" name="textH" type="RichInt" tooltip="The texture height"/>
+  <Param description="Overwrite texture" isxmlparam="0" value="false" name="overwrite" type="RichBool" tooltip="if current mesh has a texture will be overwritten (with provided texture dimension)"/>
+  <Param description="Assign texture" isxmlparam="0" value="false" name="assign" type="RichBool" tooltip="assign the newly created texture"/>
+  <Param description="Fill texture" isxmlparam="0" value="true" name="pullpush" type="RichBool" tooltip="if enabled the unmapped texture space is colored using a pull push filling algorithm, if false is set to black"/>
  </filter>
 </FilterScript>

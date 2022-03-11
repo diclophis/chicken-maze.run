@@ -67,7 +67,7 @@ do
   fi
 
   assimp export tmp/shape-${I}.obj resources/maze-${I}.glb -fglb2 --flip-uv --improve-cache-locality --remove-redundant-materials --join-identical-vertices --validate-data-structure -om -og -l -v 
-  #cp tmp/shape-0_tex.png resources/maze-${I}.glb
+  cp tmp/shape-${I}_tex.png resources/shape-${I}_tex.png
 done
 
 #cp tmp/shape-*.gltf resources/
