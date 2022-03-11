@@ -2,7 +2,7 @@ FROM wkndr:latest AS wkndr
 
 #RUN /var/lib/wkndr/iterate-web.sh
 
-COPY resources/shaders /var/lib/wkndr/resources/shaders
+#COPY resources/shaders /var/lib/wkndr/resources/shaders
 COPY resources/* /var/lib/wkndr/resources/
 COPY Wkndrfile Wkndrfile.mkmaze /var/lib/wkndr/
 

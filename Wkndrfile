@@ -585,7 +585,7 @@ Wkndr.nonce("chicken") {
   Wkndr.client_side("chicken") { |gl|
     gl.open_default_view!
 
-    distance = 4
+    distance = 1
     a = (((distance) * 2) + 1)
     b = a * a
 
