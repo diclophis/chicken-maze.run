@@ -57,7 +57,17 @@ do
   #assimp export tmp/shape-${I}.obj resources/shape-${I}.iqm -om -og -l -v 
   #assimp export tmp/shape-${I}.obj resources/shape-${I}.glb -fglb2  -om -og -l -v 
   #assimp export tmp/shape-${I}.obj resources/shape-${I}.glb -fglb2 --flip-uv --improve-cache-locality --remove-redundant-materials --join-identical-vertices --validate-data-structure -om -og -l -v 
+
+  ###sed -i -e "s~shape-0_tex\ ~map_Kd\ $THIS_WORKING_DIR/tmp/~" tmp/shape-${I}.obj.mtl
+  sed -i -e "s/map_Kd\ shape-0_tex.png/map_Kd\ shape-${I}_tex.png/" tmp/shape-${I}.obj.mtl
+  #rm tmp/shape-${I}_tex.png
+  if [ ! -e tmp/shape-${I}_tex.png ];
+  then
+    cp tmp/shape-0_tex.png tmp/shape-${I}_tex.png
+  fi
+
   assimp export tmp/shape-${I}.obj resources/maze-${I}.glb -fglb2 --flip-uv --improve-cache-locality --remove-redundant-materials --join-identical-vertices --validate-data-structure -om -og -l -v 
+  #cp tmp/shape-0_tex.png resources/maze-${I}.glb
 done
 
 #cp tmp/shape-*.gltf resources/
