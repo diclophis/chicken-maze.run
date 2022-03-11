@@ -222,12 +222,12 @@ class GameEngine
     allow_right = false
 
     arrow_keys = gl.keyspressed(KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN)
-    speed = 10.0
-    friction = speed * 0.567
-    max_v = 2.0
+    speed = 9.7
+    friction = speed * 1.3333
+    max_v = 1.3333
     rfx = 1.01
     rfy = 1.01
-    hop_timeout = 0.1
+    hop_timeout = 0.133
 
     this_direction = speed
 
@@ -458,16 +458,20 @@ class GameEngine
     @players.each { |key, rpv|
       player_position, player_velocity, pressing = *rpv
 
-      #unless pressing
-      #  player_velocity[0] += (player_velocity[0] * -1.0) * friction
-      #  player_velocity[2] += (player_velocity[2] * -1.0) * friction
-      #end
+      #player_velocity[0] += (player_velocity[0] * -1.0) * friction
+      #player_velocity[2] += (player_velocity[2] * -1.0) * friction
+
+      navx = (player_velocity[0] * -1.0) * friction * 0.99
+      navy = (player_velocity[2] * -1.0) * friction * 0.99
+
+      player_velocity[0] += (navx * delta_time)
+      player_velocity[2] += (navy * delta_time)
 
       nnx = player_position[0] + (player_velocity[0] * delta_time)
       nny = player_position[2] + (player_velocity[2] * delta_time)
 
-      player_position[0] -= (player_position[0] - nnx) * 0.5 #(player_velocity[0] * delta_time * 0.5)
-      player_position[2] -= (player_position[2] - nny) * 0.5 #(player_velocity[2] * delta_time * 0.5)
+      player_position[0] -= (player_position[0] - nnx) # * 0.5 #(player_velocity[0] * delta_time * 0.5)
+      player_position[2] -= (player_position[2] - nny) # * 0.5 #(player_velocity[2] * delta_time * 0.5)
     }
 
     if @time_since_last_hop > hop_timeout
