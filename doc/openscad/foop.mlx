@@ -1,7 +1,7 @@
 <!DOCTYPE FilterScript>
 <FilterScript>
  <filter name="Subdivision Surfaces: Midpoint">
-  <Param tooltip="Number of time the model is subdivided." type="RichInt" name="Iterations" isxmlparam="0" value="3" description="Iterations"/>
+  <Param tooltip="Number of time the model is subdivided." type="RichInt" name="Iterations" isxmlparam="0" value="1" description="Iterations"/>
   <Param tooltip="All the edges &lt;b>longer&lt;/b> than this threshold will be refined.&lt;br>Setting this value to zero will force an uniform refinement." max="1.41973" type="RichAbsPerc" name="Threshold" isxmlparam="0" value="0.014197" description="Edge Threshold" min="0"/>
   <Param tooltip="If selected the filter affect only the selected faces" type="RichBool" name="Selected" isxmlparam="0" value="false" description="Affect only selected faces"/>
  </filter>
@@ -19,57 +19,55 @@
  </filter>
 
  <filter name="Re-Compute Face Normals"/>
+<!--
+ <filter name="Per Face Quality according to Triangle shape and aspect ratio">
+  <Param enum_val3="Area" enum_val7="Polygonal planarity (relative)" enum_val1="inradius/circumradius" enum_val2="Mean ratio" value="2" isxmlparam="0" name="Metric" description="Metric:" type="RichEnum" tooltip="Choose a metric to compute triangle quality." enum_cardinality="8" enum_val0="area/max side" enum_val6="Polygonal planarity (max)" enum_val5="Texture Area Distortion" enum_val4="Texture Angle Distortion"/>
+ </filter>
+ <filter name="Colorize by face Quality">
+  <Param value="0" isxmlparam="0" name="minVal" description="Min" type="RichFloat" tooltip="The value that will be mapped with the lower end of the scale (blue)"/>
+  <Param value="0.866" isxmlparam="0" name="maxVal" description="Max" type="RichFloat" tooltip="The value that will be mapped with the upper end of the scale (red)"/>
+  <Param max="100" value="0" isxmlparam="0" name="perc" description="Percentile Crop [0..100]" type="RichDynamicFloat" tooltip="If not zero this value will be used for a percentile cropping of the quality values.&lt;br> If this parameter is set to a value &lt;i>P&lt;/i> then the two values &lt;i>V_min,V_max&lt;/i> for which &lt;i>P&lt;/i>% of the faces have a quality &lt;b>lower or greater than &lt;i>V_min,V_max&lt;/i> are used as min/max values for clamping.&lt;br>&lt;br> The automated percentile cropping is very useful for automatically discarding outliers." min="0"/>
+  <Param value="false" isxmlparam="0" name="zeroSym" description="Zero Symmetric" type="RichBool" tooltip="If true the min max range will be enlarged to be symmetric (so that green is always Zero)"/>
+ </filter>
+ <filter name="Transfer Color: Face to Vertex"/>
+-->
+
+ <filter name="Remeshing: Isotropic Explicit Remeshing">
+  <Param isxmlparam="0" value="3" name="Iterations" description="Iterations" type="RichInt" tooltip="Number of iterations of the remeshing operations to repeat on the mesh."/>
+  <Param isxmlparam="0" value="false" name="Adaptive" description="Adaptive remeshing" type="RichBool" tooltip="Toggles adaptive isotropic remeshing."/>
+  <Param isxmlparam="0" value="false" name="SelectedOnly" description="Remesh only selected faces" type="RichBool" tooltip="If checked the remeshing operations will be applied only to the selected faces."/>
+  <Param isxmlparam="0" value="0.011859" name="TargetLen" description="Target Length" max="1.18585" type="RichAbsPerc" tooltip="Sets the target length for the remeshed mesh edges." min="0"/>
+  <Param isxmlparam="0" value="30" name="FeatureDeg" description="Crease Angle" type="RichFloat" tooltip="Minimum angle between faces of the original to consider the shared edge as a feature to be preserved."/>
+  <Param isxmlparam="0" value="true" name="CheckSurfDist" description="Check Surface Distance" type="RichBool" tooltip="If toggled each local operation must deviate from original mesh by [Max. surface distance]"/>
+  <Param isxmlparam="0" value="0.011859" name="MaxSurfDist" description="Max. Surface Distance" max="1.18585" type="RichAbsPerc" tooltip="Maximal surface deviation allowed for each local operation" min="0"/>
+  <Param isxmlparam="0" value="true" name="SplitFlag" description="Refine Step" type="RichBool" tooltip="If checked the remeshing operations will include a refine step."/>
+  <Param isxmlparam="0" value="true" name="CollapseFlag" description="Collapse Step" type="RichBool" tooltip="If checked the remeshing operations will include a collapse step."/>
+  <Param isxmlparam="0" value="true" name="SwapFlag" description="Edge-Swap Step" type="RichBool" tooltip="If checked the remeshing operations will include a edge-swap step, aimed at improving the vertex valence of the resulting mesh."/>
+  <Param isxmlparam="0" value="true" name="SmoothFlag" description="Smooth Step" type="RichBool" tooltip="If checked the remeshing operations will include a smoothing step, aimed at relaxing the vertex positions in a Laplacian sense."/>
+  <Param isxmlparam="0" value="true" name="ReprojectFlag" description="Reproject Step" type="RichBool" tooltip="If checked the remeshing operations will include a step to reproject the mesh vertices on the original surface."/>
+ </filter>
+
 
  <filter name="Conditional Face Selection">
   <Param name="condSelect" value="(y1 &lt; 0.0001) &amp;&amp; (y2 &lt; 0.0001) &amp;&amp; (y0 &lt; 0.0001)" description="boolean function" isxmlparam="0" type="RichString" tooltip="type a boolean function that will be evaluated in order to select a subset of faces&lt;br>"/>
  </filter>
  <filter name="Delete Selected Faces"/>
 
-<!--
- <filter name="Parametrization: Trivial Per-Triangle">
-  <Param tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation" isxmlparam="0" type="RichInt" description="Quads per line" value="0" name="sidedim"/>
-  <Param tooltip="Gives an indication on how big the texture is" isxmlparam="0" type="RichInt" description="Texture Dimension (px)" value="1024" name="textdim"/>
-  <Param tooltip="Specifies how many pixels to be left between triangles in parametrization domain" isxmlparam="0" type="RichInt" description="Inter-Triangle border (px)" value="2" name="border"/>
-  <Param enum_cardinality="2" enum_val0="Basic" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain" isxmlparam="0" enum_val1="Space-optimizing" type="RichEnum" description="Method" value="1" name="method"/>
- </filter>
- <filter name="Transfer: Vertex Color to Texture">
-  <Param tooltip="The texture file to be created" isxmlparam="0" type="RichString" description="Texture file" value="shape-0_tex.png" name="textName"/>
-  <Param tooltip="The texture width" isxmlparam="0" type="RichInt" description="Texture width (px)" value="1024" name="textW"/>
-  <Param tooltip="The texture height" isxmlparam="0" type="RichInt" description="Texture height (px)" value="1024" name="textH"/>
-  <Param tooltip="if current mesh has a texture will be overwritten (with provided texture dimension)" isxmlparam="0" type="RichBool" description="Overwrite texture" value="false" name="overwrite"/>
-  <Param tooltip="assign the newly created texture" isxmlparam="0" type="RichBool" description="Assign texture" value="false" name="assign"/>
-  <Param tooltip="if enabled the unmapped texture space is colored using a pull push filling algorithm, if false is set to black" isxmlparam="0" type="RichBool" description="Fill texture" value="true" name="pullpush"/>
- </filter>
--->
-
-<!--
- <filter name="Per Face Quality according to Triangle shape and aspect ratio">
-  <Param value="3" enum_val4="Texture Angle Distortion" enum_val7="Polygonal planarity (relative)" enum_val5="Texture Area Distortion" type="RichEnum" enum_val0="area/max side" tooltip="Choose a metric to compute triangle quality." enum_val3="Area" enum_cardinality="8" enum_val1="inradius/circumradius" enum_val2="Mean ratio" name="Metric" description="Metric:" enum_val6="Polygonal planarity (max)" isxmlparam="0"/>
- </filter>
- <filter name="Colorize by face Quality">
-  <Param value="0" type="RichFloat" tooltip="The value that will be mapped with the lower end of the scale (blue)" name="minVal" description="Min" isxmlparam="0"/>
-  <Param value="0.001" type="RichFloat" tooltip="The value that will be mapped with the upper end of the scale (red)" name="maxVal" description="Max" isxmlparam="0"/>
-  <Param value="0" type="RichDynamicFloat" tooltip="If not zero this value will be used for a percentile cropping of the quality values.&lt;br> If this parameter is set to a value &lt;i>P&lt;/i> then the two values &lt;i>V_min,V_max&lt;/i> for which &lt;i>P&lt;/i>% of the faces have a quality &lt;b>lower or greater than &lt;i>V_min,V_max&lt;/i> are used as min/max values for clamping.&lt;br>&lt;br> The automated percentile cropping is very useful for automatically discarding outliers." max="100" min="0" name="perc" description="Percentile Crop [0..100]" isxmlparam="0"/>
-  <Param value="false" type="RichBool" tooltip="If true the min max range will be enlarged to be symmetric (so that green is always Zero)" name="zeroSym" description="Zero Symmetric" isxmlparam="0"/>
- </filter>
- <filter name="Transfer Color: Face to Vertex"/>
--->
-
- <filter name="Ambient Occlusion">
-  <Param enum_cardinality="2" enum_val1="per-Face (deprecated)" value="0" isxmlparam="0" type="RichEnum" description="Occlusion mode:" name="occMode" enum_val0="per-Vertex" tooltip="Occlusion may be calculated per-vertex or per-face, color and quality will be saved in the chosen component."/>
-  <Param value="0.3" isxmlparam="0" type="RichFloat" description="Directional Bias [0..1]" name="dirBias" tooltip="The balance between a uniform and a directionally biased set of lighting direction&lt;br>: - 0 means light came only uniformly from any direction&lt;br> - 1 means that all the light cames from the specified cone of directions &lt;br> - other values mix the two set of lighting directions "/>
-  <Param value="512" isxmlparam="0" type="RichInt" description="Requested views" name="reqViews" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time"/>
-  <Param z="-0.6049" isxmlparam="0" type="RichPoint3f" description="Lighting Direction" y="1.5564" x="1.7005" name="coneDir" tooltip="Number of different views placed around the mesh. More views means better accuracy at the cost of increased calculation time"/>
-  <Param value="66" isxmlparam="0" type="RichFloat" description="Cone amplitude" name="coneAngle" tooltip="Number of different views uniformly placed around the mesh. More views means better accuracy at the cost of increased calculation time"/>
-  <Param value="true" isxmlparam="0" type="RichBool" description="Use GPU acceleration" name="useGPU" tooltip="Only works for per-vertex AO. In order to use GPU-Mode, your hardware must support FBOs, FP32 Textures and Shaders. Normally increases the performance by a factor of 4x-5x"/>
-  <Param value="512" isxmlparam="0" type="RichInt" description="Depth texture size(should be 2^n)" name="depthTexSize" tooltip="Defines the depth texture size used to compute occlusion from each point of view. Higher values means better accuracy usually with low impact on performance"/>
- </filter>
-
  <filter name="Parametrization: Trivial Per-Triangle">
   <Param description="Quads per line" isxmlparam="0" value="0" name="sidedim" type="RichInt" tooltip="Indicates how many triangles have to be put on each line (every quad contains two triangles)&#xa;Leave 0 for automatic calculation"/>
   <Param description="Texture Dimension (px)" isxmlparam="0" value="1024" name="textdim" type="RichInt" tooltip="Gives an indication on how big the texture is"/>
   <Param description="Inter-Triangle border (px)" isxmlparam="0" value="2" name="border" type="RichInt" tooltip="Specifies how many pixels to be left between triangles in parametrization domain"/>
   <Param enum_val0="Basic" description="Method" enum_val1="Space-optimizing" isxmlparam="0" value="1" name="method" type="RichEnum" tooltip="Choose space optimizing to map smaller faces into smaller triangles in parametrizazion domain" enum_cardinality="2"/>
+ </filter>
+
+ <filter name="Volumetric obscurance">
+  <Param enum_cardinality="2" tooltip="Choose whether to trace rays from faces or from vertices. " enum_val0="On vertices" type="RichEnum" description="Metric:" name="onPrimitive" value="0" enum_val1="On Faces" isxmlparam="0"/>
+  <Param tooltip="The number of rays that will be casted around the normals." type="RichInt" description="Number of rays: " name="numberRays" value="128" isxmlparam="0"/>
+  <Param tooltip="Size of the depth texture for depth peeling. Higher resolutions provide better sampling of the mesh, with a small performance penalty." type="RichInt" description="Depth texture size" name="DepthTextureSize" value="512" isxmlparam="0"/>
+  <Param tooltip="Number of depth peeling iteration. Actually is the maximum number of layers that a ray can hit while traversing the mesh. For example, in the case of a sphere, you should specify 2 in this parameter. For a torus, specify 4. &lt;b>For more complex geometry you should run the depth complexity filter to know the exact value&lt;/b>." type="RichInt" description="Peeling Iteration" name="peelingIteration" value="10" isxmlparam="0"/>
+  <Param tooltip="Depth tolerance used during depth peeling. This is the threshold used to differentiate layers between each others.Two elements whose distance is below this value will be considered as belonging to the same layer." type="RichFloat" description="Peeling Tolerance" name="peelingTolerance" value="1e-07" isxmlparam="0"/>
+  <Param tooltip="Cone amplitude around normals in degrees. Rays are traced within this cone." type="RichFloat" description="Cone amplitude" name="coneAngle" value="120" isxmlparam="0"/>
+  <Param tooltip="This parameter controls the spatial decay term in the obscurance formula. The greater the exponent, the greater the influence of distance; that is: even if a ray is blocked by an occluder its contribution to the obscurance term is non zero, but proportional to this parameter. It turs out that if you choose a value of zero, you get the standard ambient occlusion term. &lt;b>(In this case, only a value of two, in the peeling iteration parameter, has a sense)&lt;/b>" type="RichFloat" description="Obscurance Exponent" name="obscuranceExponent" value="0.1" isxmlparam="0"/>
  </filter>
 
  <filter name="Transfer: Vertex Color to Texture">
