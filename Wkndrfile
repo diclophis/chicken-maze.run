@@ -202,6 +202,11 @@ class GameEngine
   end
 
   def update(gl, global_time, delta_time)
+    #mx, my, l = nil
+    #gl.mousep { |xyl|
+    #  mx, my, l = *xyl
+    #}
+
     @last_delta_time = delta_time
     @last_global_time = global_time
     @ticks += 1
@@ -652,7 +657,3 @@ Wkndr.nonce("chicken") {
 }
 
 Wkndr.run(GameEngine)
-
-Wkndr.server_side("mkmaze") { |gl, server|
-  server.wsb("/")
-}
