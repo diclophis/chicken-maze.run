@@ -231,12 +231,11 @@ class GameEngine
     allow_right = false
 
     arrow_keys = gl.keyspressed(KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN)
-    speed = 0.3333
-    friction = 15.0
-    max_v = 2.5
+    speed = 0.1333
+    friction = 3.3333
+    max_v = 20.333
     rfx = 0.999
     rfy = 0.999
-    hop_timeout = 0.133
 
     this_direction = speed
 
@@ -259,8 +258,8 @@ class GameEngine
       end
     end
 
-    nx = @player_position[0] + (@player_velocity[0] * delta_time)
-    ny = @player_position[2] + (@player_velocity[2] * delta_time)
+    nx = @player_position[0] + (@player_velocity[0])
+    ny = @player_position[2] + (@player_velocity[2])
 
     px = nx.round
     py = ny.round
@@ -397,8 +396,8 @@ class GameEngine
           dotNormalY = dotProduct * normalY
           reflectedRayTipX = rayTipX - (dotNormalX * 2)
           reflectedRayTipY = rayTipY - (dotNormalY * 2)
-          @player_velocity[0] = (reflectedRayTipX * rfx) + ((rand - 0.5) * 0.0001)
-          @player_velocity[2] = (reflectedRayTipY * rfy) + ((rand - 0.5) * 0.0001)
+          @player_velocity[0] = (reflectedRayTipX * rfx) + ((rand - 0.5) * 0.001)
+          @player_velocity[2] = (reflectedRayTipY * rfy) + ((rand - 0.5) * 0.001)
         else
           @player_position[0] = nx
           @player_position[2] = ny
@@ -409,79 +408,9 @@ class GameEngine
       @player_position[2] = ny
     end
 
-    avx = intended_forces[0]
-    avy = intended_forces[1]
+    @player_velocity[0] += (intended_forces[0] * delta_time) - (@player_velocity[0] * friction * delta_time)
 
-    #log!(:speed, @player_velocity[0], @player_velocity[2])
-    if !got_lr
-      #avx += (@player_velocity[0] * -1.0) * friction * delta_time
-      @player_velocity[0] -= @player_velocity[0] * friction * delta_time
-    else
-      @player_velocity[0] += intended_forces[0]
-    end
-
-    if !got_ud
-      #avy += (@player_velocity[2] * -1.0) * friction * delta_time
-      #@player_velocity[2] = 0.0
-      #@player_velocity[2] *= 0.5 * delta_time
-      #@player_velocity[2] *= 0.1 * delta_time
-      @player_velocity[2] -= @player_velocity[2] * friction * delta_time
-      #log!(:slow_down)
-    else
-      @player_velocity[2] += intended_forces[1]
-    end
-
-    if @player_velocity[0] > max_v
-      @player_velocity[0] = max_v
-    end
-
-    if @player_velocity[0] < -max_v
-      @player_velocity[0] = -max_v
-    end
-
-    if @player_velocity[2] > max_v
-      @player_velocity[2] = max_v
-    end
-
-    if @player_velocity[2] < -max_v
-      @player_velocity[2] = -max_v
-    end
-
-
-
-
-    old_pressing = @pressing
-
-    if (got_lr || got_ud) && !@pressing
-      @pressing = true
-    elsif !got_lr && !got_ud && @pressing
-      @pressing = false
-    end
-
-    if (old_pressing != @pressing) || bounced #(got_lr || got_ud || bounced) && (old_pressing != @pressing)
-      @time_since_last_hop = hop_timeout
-    end
-
-    @time_since_last_hop += delta_time
-
-    #@player_velocity[0] += (avx)
-    #@player_velocity[2] += (avy)
-
-    #if @player_velocity[0] > max_v
-    #  @player_velocity[0] = max_v
-    #end
-
-    #if @player_velocity[0] < -max_v
-    #  @player_velocity[0] = -max_v
-    #end
-
-    #if @player_velocity[2] > max_v
-    #  @player_velocity[2] = max_v
-    #end
-
-    #if @player_velocity[2] < -max_v
-    #  @player_velocity[2] = -max_v
-    #end
+    @player_velocity[2] += (intended_forces[1] * delta_time) - (@player_velocity[2] * friction * delta_time)
 
     if px != @cpx
       @cpx = px
@@ -513,11 +442,11 @@ class GameEngine
       player_position[2] -= (player_position[2] - nny) # * 0.5 #(player_velocity[2] * delta_time * 0.5)
     }
 
-    if @time_since_last_hop > hop_timeout
-      @time_since_last_hop = 0
-      gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity, @pressing]}})
-      @sent += 1
-    end 
+    #if @time_since_last_hop > hop_timeout
+    #  @time_since_last_hop = 0
+    #  gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity, @pressing]}})
+    #  @sent += 1
+    #end
 
     :keep_running
   end
