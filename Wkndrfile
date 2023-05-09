@@ -40,7 +40,7 @@ class ShapeProxy
   end
 end
 
-class GameEngine
+class ExGameEngine
   PRIMARY  = 0x000000FF
 
   def initialize(distance, maze_level, cube, shapes, batcher, shape_batchers, direction)
@@ -158,16 +158,26 @@ class GameEngine
     @game.draw_twod(gl)
   end
 
+               #(gl, distance, chic, shapes, @batche, shape_batchers)
   def self.start(gl, distance, cube, shapes, batcher, shape_batchers, starting_level = 1, direction = :level_up)
+    Wkndr.log! [:prev, @start_game_proc]
+
     @start_game_proc ||= Proc.new { |maze_level, direction_inner|
+      Wkndr.log! [:after, maze_level, direction_inner]
+
       @camera = GameCamera.new(2.0, 1.3)
       @game = self.new(distance, maze_level, cube, shapes, batcher, shape_batchers, direction_inner)
+
+      Wkndr.log! [:after2, maze_level, direction_inner]
       if maze_level > 0
-        log!(:mkmaze, @game.level)
+        Wkndr.log! [:mkmaze, @game.level]
 
         gl.emit({"mkmaze" => @game.level})
       end
     }
+
+    Wkndr.log! [@start_game_proc, starting_level, direction]
+
     @start_game_proc.call(starting_level, direction)
   end
 
@@ -581,8 +591,9 @@ Wkndr.nonce("chicken") {
       shapes[i] = m
     }
 
-    GameEngine.start(gl, distance, chicken_model, shapes, @batcher, shape_batchers)
+    Wkndr.log! [:GameEngineStart, store, shapes]
+    ExGameEngine.start(gl, distance, chicken_model, shapes, @batcher, shape_batchers)
   }
 }
 
-Wkndr.run(GameEngine)
+Wkndr.run(ExGameEngine)

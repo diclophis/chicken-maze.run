@@ -3372,7 +3372,11 @@ end
 #}
 
 Wkndr.client_side("mkmaze") { |gl|
+  Wkndr.log! [:mkmaze_client_init]
+
   gl.event("mkmaze") { |channel, msg|
+    Wkndr.log! [:mkmaze_event, channel, msg]
+
     case channel
       when "mkmaze"
         srand(msg.to_i)
