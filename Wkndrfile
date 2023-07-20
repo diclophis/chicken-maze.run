@@ -12,7 +12,7 @@ class ArmatureAnimation
 
   def start(cx, cy, cz, tx, ty, tz)
     reset
-    @max_time = 0.2795
+    @max_time = 0.2379
     @cx = cx
     @cy = cy
     @cz = cz
@@ -23,7 +23,7 @@ class ArmatureAnimation
     @py = cy
     @pz = cz
     @state = :started
-    Wkndr.log! [:xstart, cx, cy, cz, tx, ty, tz]
+    #Wkndr.log! [:xstart, cx, cy, cz, tx, ty, tz]
   end
 
   def state
@@ -242,7 +242,7 @@ class ExGameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
-    @camera.update(gl, global_time, delta_time, 6.0, 15.0, @game.player_position)
+    @camera.update(gl, global_time, delta_time, 3.0, 7.0, @game.player_position)
 
     case @game.update(gl, global_time, delta_time)
       when :level_up
@@ -347,12 +347,10 @@ class ExGameEngine
         distance = [xx.to_f - @player_position[0], yy.to_f - @player_position[2]]
         #norm = Math.sqrt(distance[0] ** 2 + distance[1] ** 2)
         direction = [distance[0], distance[1]]
-
-
         rx = @player_position[0] + (5.0 * direction[0])
         ry = @player_position[2] + (5.0 * direction[1])
 
-        Wkndr.log! [:dir, direction, :xx, xx, yy, :rx, rx, ry, :player, *@player_position]
+        #Wkndr.log! [:dir, direction, :xx, xx, yy, :rx, rx, ry, :player, *@player_position]
 
         started = false
 
@@ -384,7 +382,7 @@ class ExGameEngine
 
             if anm.state == :reset || (anm.output[1] < -0.0 && anm.state == :idling)
               @ach[xxyy] = anm
-              anm.start(rx, 0.0, ry, xx, 0.0, yy)
+              anm.start(rx, -1.0, ry, xx, 0.0, yy)
               started = true
               break
             end
@@ -397,7 +395,7 @@ class ExGameEngine
           extra_buffer = ArmatureAnimation.new
           @anm[b] << extra_buffer
           @ach[xxyy] = extra_buffer
-          extra_buffer.start(rx, 0.0, ry, xx, 0.0, yy)
+          extra_buffer.start(rx, -1.0, ry, xx, 0.0, yy)
         end
 
 
@@ -406,6 +404,7 @@ class ExGameEngine
 
       old_xyz.each { |xxyy_s|
         xxyy = @cch[xxyy_s]
+        oxx, oyy = *xxyy
 
         ##Wkndr.log! [:old, xxyy]
         #theta = Math.rand * 2.0 * 3.1457
@@ -421,7 +420,14 @@ class ExGameEngine
         #  #Wkndr.log! [anm.age]
         #    if anm.state == :reset #|| anm.state == :idling
         #      #@ach[xxyy] = anm
-          anm.start(*anm.output, anm.output[0], -10.0, anm.output[2])
+
+        odistance = [oxx.to_f - @player_position[0], oyy.to_f - @player_position[2]]
+        #norm = Math.sqrt(distance[0] ** 2 + distance[1] ** 2)
+        odirection = [odistance[0], odistance[1]]
+        orx = oxx + (5.0 * odirection[0])
+        ory = oyy + (5.0 * odirection[1])
+
+          anm.start(*anm.output, orx, -1.0, ory)
         end
       }
 
