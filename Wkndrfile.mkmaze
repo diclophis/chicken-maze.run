@@ -3371,45 +3371,81 @@ end
 #  }
 #}
 
+def make_maze(msg)
+  @mazes ||= {}
+
+  if @mazes[msg].nil?
+    srand(msg)
+
+    braid = rand * 100.0
+    weave = 0 #TODO
+    sparse = rand * 100.0
+    randomness = rand * 100.0
+    maze_size = (msg * msg)
+    exit_pos = [maze_size, maze_size-1]
+
+    # generate a orthogonal maze
+    maze = Theseus::OrthogonalMaze.generate({
+      :wrap => "xy",
+      :width => maze_size,
+      :height => maze_size,
+      :braid => braid,
+      :weave => weave,
+      :sparse => sparse,
+      :randomness => randomness,
+      :exit => exit_pos
+    })
+
+    out = []
+    maze_size.times { |w|
+      out[w] ||= []
+      maze_size.times { |h|
+        out[w][h] = maze[w, h]
+      }
+    }
+
+    new_maze = [msg, maze_size, exit_pos, out]
+    @mazes[msg] = new_maze
+  end
+
+  @mazes[msg]
+end
+
 Wkndr.client_side("mkmaze") { |gl|
   Wkndr.log! [:mkmaze_client_init]
 
   gl.event("mkmaze") { |channel, msg|
-    Wkndr.log! [:mkmaze_event, channel, msg]
+    #Wkndr.log! [:mkmaze_event, channel, msg]
 
     case channel
       when "mkmaze"
-        srand(msg.to_i)
+        maze_id = msg.to_i
+        make_maze(maze_id)
 
-        braid = rand * 100.0
-        weave = 0 #TODO
-        sparse = rand * 100.0
-        randomness = rand * 100.0
-        maze_s = (msg.to_i * msg.to_i)
-        exit_pos = [maze_s, maze_s-1]
+      when "maze_for_location"
+        location = msg["location"]
+        maze_id = msg["maze_id"]
+        maze = make_maze(maze_id)
 
-        # generate a orthogonal maze
-        maze = Theseus::OrthogonalMaze.generate({
-          :wrap => "xy",
-          :width => maze_s,
-          :height => maze_s,
-          :braid => braid,
-          :weave => weave,
-          :sparse => sparse,
-          :randomness => randomness,
-          :exit => exit_pos
-        })
+        maze_id_msg, maze_size, exit_pos, out = *maze
 
-        out = []
-        maze_s.times { |w|
-          out[w] ||= []
-          maze_s.times { |h|
-            out[w][h] = maze[w, h]
+        #Wkndr.log! [:mazemk, maze]
+
+        flatb = {}
+        out.each_with_index { |wwh, w|
+          #Wkndr.log! [:wwh, maze_id, w, wwh, location]
+          wwh.each_with_index { |whh, h|
+            if ((location[0] - w).abs < 1.5) && ((location[2] - h).abs < 1.5)
+              flatb[[w,h]] = whh
+              #Wkndr.log! [:chunk_msg, [w, h], whh]
+            end
           }
         }
 
-        gl.emit({"maze" => [msg.to_i, maze_s, exit_pos, out]})
+        chunk_msg = [maze_id, maze_size, exit_pos, flatb]
+        gl.emit({"chunk_msg" => chunk_msg})
 
     end
   }
+  Wkndr.log! [:mkmaze_client_init_done]
 }
