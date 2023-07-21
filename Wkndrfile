@@ -2,11 +2,6 @@
 
 class ArmatureAnimation
   def initialize
-    #theta = Math.rand * 2.0 * 3.1457
-    #@px = 10.0 * Math.cos(theta)
-    #@py = -1.0
-    #@pz = 10.0 * Math.sin(theta)
-
     reset
   end
 
@@ -49,12 +44,14 @@ class ArmatureAnimation
     #if phase_percent < 0.333
     #  in_thirds = (phase_percent / 0.333)
     #  @px = @cx
-    #  @py = @cy - (in_thirds * (@cy - (@cy - 1.0)))
+    #  @py = @cy - (in_thirds * ((@cy - 1.0)))
     #  @pz = @cz
     #  #Wkndr.log! [:downward, @py, phase_percent, in_thirds]
     #  @state = :downwards
     #elsif phase_percent < 0.666
     #  in_thirds = ((phase_percent - 0.333) / 0.333)
+    #  #@px = @cx - (in_thirds * (@cx - @tx))
+    #  #@pz = @cz - (in_thirds * (@cz - @tz))
     #  @px = @cx - (in_thirds * (@cx - @tx))
     #  @pz = @cz - (in_thirds * (@cz - @tz))
     #  #Wkndr.log! [:across, phase_percent, in_thirds]
@@ -63,11 +60,11 @@ class ArmatureAnimation
     #  in_thirds = ((phase_percent - 0.666) / 0.333)
     #  @px = @tx
     #  #@py = @ty # - (in_thirds * ((@ty - 1.0)))
-    #  @py = (@ty - 1.0) - (in_thirds * ((@ty - 1.0) - (@ty)))
+    #  @py = (in_thirds * @ty)
     #  @pz = @tz
     #  #Wkndr.log! [:upwards, @py, phase_percent, in_thirds]
     #  @state = :upwards
-    ##elsif phase_percent < 1.1
+    ###elsif phase_percent < 1.1
     if phase_percent < 1.0
       @px = @cx - (phase_percent * (@cx - @tx))
       @py = @cy - (phase_percent * (@cy - @ty))
@@ -329,13 +326,9 @@ class ExGameEngine
 
       @last_xyz = new_keys
 
-      #Wkndr.log! [:a => new_xyz, :b => old_xyz, :new_keys => new_keys]
-
       new_xyz.each { |xxyy_s|
         xxyy = @cch[xxyy_s]
-        #Wkndr.log! [:new, xxyy_s, xxyy]
         xx, yy = *xxyy
-        #flatb[xxyy]
         @maze[xx] ||= {}
 
         #if !@got_spawn && xx == 0 && yy == 0 && @maze[xx][yy] == nil
@@ -349,39 +342,15 @@ class ExGameEngine
         distance = [xx.to_f - @player_position[0], yy.to_f - @player_position[2]]
         #norm = Math.sqrt(distance[0] ** 2 + distance[1] ** 2)
         direction = [distance[0], distance[1]]
-        rx = @player_position[0] + (5.0 * direction[0])
-        ry = @player_position[2] + (5.0 * direction[1])
-
-        #Wkndr.log! [:dir, direction, :xx, xx, yy, :rx, rx, ry, :player, *@player_position]
+        rx = @player_position[0] + (3.79 * direction[0])
+        ry = @player_position[2] + (3.79 * direction[1])
 
         started = false
 
-        if @ach[xxyy] == nil # || (@ach[xxyy].state == :idling)
-        #  eldest = nil
-        #  @anm[b].each { |anm|
-        #    if eldest == nil || eldest.age < anm.age
-        #      eldest = anm
-        #    end
-
-        #    if anm.state == :reset # || (eldest == anm && anm.state == :idling)
-        #      @ach[xxyy] = anm
-        #      anm.start(rx, 0.0, ry, xx, 0.0, yy)
-        #      started = true
-        #      break
-        #    end
-        #  }
-
-        #  unless started
-        #    @ach[xxyy] = eldest
-        #    eldest.start(rx, 0.0, ry, xx, 0.0, yy)
-        #  end
-        #end
-
-        @anm[b].sort_by { |aa|
-          -aa.age
-        }.each { |anm|
-          #Wkndr.log! [anm.age]
-
+        if @ach[xxyy] == nil
+          @anm[b].sort_by { |aa|
+            -aa.age
+          }.each { |anm|
             if anm.state == :reset || (anm.output[1] < -0.0 && anm.state == :idling)
               @ach[xxyy] = anm
               if xx == 0 && yy == 0
@@ -392,24 +361,18 @@ class ExGameEngine
               started = true
               break
             end
+          }
 
-        }
-
-        #raise "not enough buffer" if !started
-
-        if !started
-          extra_buffer = ArmatureAnimation.new
-          @anm[b] << extra_buffer
-          @ach[xxyy] = extra_buffer
-          if xx == 0 && yy == 0
-            extra_buffer.start(xx, -10.0, yy, xx, 0.0, yy)
-          else
-            extra_buffer.start(rx, -1.0, ry, xx, 0.0, yy)
+          if !started
+            extra_buffer = ArmatureAnimation.new
+            @anm[b] << extra_buffer
+            @ach[xxyy] = extra_buffer
+            if xx == 0 && yy == 0
+              extra_buffer.start(xx, -10.0, yy, xx, 0.0, yy)
+            else
+              extra_buffer.start(rx, -1.0, ry, xx, 0.0, yy)
+            end
           end
-          #extra_buffer.start(rx, -1.0, ry, xx, 0.0, yy)
-        end
-
-
         end
       }
 
@@ -417,28 +380,19 @@ class ExGameEngine
         xxyy = @cch[xxyy_s]
         oxx, oyy = *xxyy
 
-        ##Wkndr.log! [:old, xxyy]
-        #theta = Math.rand * 2.0 * 3.1457
-        #rx = @player_position[0] + 10.0 * Math.cos(theta)
-        #ry = @player_position[2] + 10.0 * Math.sin(theta)
-
         if anm = @ach[xxyy]
           @ach.delete(xxyy)
 
-        #@anm[b].sort_by { |aa|
-        #  aa.age
-        #}.each { |anm|
-        #  #Wkndr.log! [anm.age]
-        #    if anm.state == :reset #|| anm.state == :idling
-        #      #@ach[xxyy] = anm
-
           odistance = [oxx.to_f - @player_position[0], oyy.to_f - @player_position[2]]
-          #norm = Math.sqrt(distance[0] ** 2 + distance[1] ** 2)
           odirection = [odistance[0], odistance[1]]
-          orx = oxx + (5.0 * odirection[0])
-          ory = oyy + (5.0 * odirection[1])
+          orx = oxx + (3.79 * odirection[0])
+          ory = oyy + (3.79 * odirection[1])
 
-          anm.start(*anm.output, orx, -1.0, ory)
+          if oxx == 0 && oyy == 0 #NOTE: special case for 0,0
+            anm.start(oxx, 0.0, oyy, oxx, -10.0, oyy)
+          else
+            anm.start(*anm.output, orx, -1.0, ory)
+          end
         end
       }
 
@@ -476,11 +430,9 @@ class ExGameEngine
     #allow_right = false
 
     arrow_keys = gl.keyspressed(KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN)
-    speed = 7.1333
-    friction = 3.3333
+    speed = 9.357
+    friction = 3.597
 
-    #max_v = 20.333
-    
     rfx = 0.999
     rfy = 0.999
 
@@ -507,7 +459,6 @@ class ExGameEngine
       end
     end
 
-
     #if @maze_level > 0
     ##NOTE: maze exit code
     #  if @maze_exit == maze_current
@@ -524,49 +475,11 @@ class ExGameEngine
     #    @at_exit_time = 0.0
     #  end
 
-    ##NOTE: collision code
-    #  if !player_at_shape 
-    #    @player_velocity[0] = -@player_velocity[0]
-    #    @player_velocity[2] = -@player_velocity[2]
-    #  else
-    #    #if bounced
-    #    #  if bounced == :y
-    #    #    line_x1, line_y1, line_x2, line_y2 = @lne_x1, @lne_y1, @lne_x2, @lne_y2
-    #    #  end
-    #    #  if bounced == :x
-    #    #    line_x1, line_y1, line_x2, line_y2 = @lin_x1, @lin_y1, @lin_x2, @lin_y2
-    #    #  end
-    #    #  normalY = line_x2 - line_x1
-    #    #  normalX = line_y1 - line_y2
-    #    #  normalLength = Math.sqrt(normalX * normalX + normalY * normalY)
-    #    #  normalX = normalX / normalLength
-    #    #  normalY = normalY / normalLength
-    #    #  rayTipX = @player_velocity[0]
-    #    #  rayTipY = @player_velocity[2]
-    #    #  rayX = rayTipX
-    #    #  rayY = rayTipY 
-    #    #  dotProduct = (rayX * normalX) + (rayY * normalY)
-    #    #  dotNormalX = dotProduct * normalX
-    #    #  dotNormalY = dotProduct * normalY
-    #    #  reflectedRayTipX = rayTipX - (dotNormalX * 2)
-    #    #  reflectedRayTipY = rayTipY - (dotNormalY * 2)
-    #    #  @player_velocity[0] = (reflectedRayTipX * rfx) + ((rand - 0.5) * 0.001)
-    #    #  @player_velocity[2] = (reflectedRayTipY * rfy) + ((rand - 0.5) * 0.001)
-    #    #else
-    #    #  @player_position[0] = nx
-    #    #  @player_position[2] = ny
-    #    #end
-    #  end
-    #else
-    #  @player_position[0] = nx
-    #  @player_position[2] = ny
-    #end
-
     nx = @player_position[0] + (@player_velocity[0] * delta_time)
     ny = @player_position[2] + (@player_velocity[2] * delta_time)
 
-    @player_velocity[0] += (intended_forces[0] * delta_time) - (@player_velocity[0] * friction * delta_time)
-    @player_velocity[2] += (intended_forces[1] * delta_time) - (@player_velocity[2] * friction * delta_time)
+    @player_velocity[0] += ((intended_forces[0] * 1.0) - (@player_velocity[0] * friction)) * delta_time
+    @player_velocity[2] += ((intended_forces[1] * 1.0) - (@player_velocity[2] * friction)) * delta_time
 
     px = @player_position[0].round
     py = @player_position[2].round
@@ -579,6 +492,7 @@ class ExGameEngine
       @player_position[2] = ny
       #DEBUG physics
     else
+    ### SIMPLE COLLISION ###########################333
       #TODO: make this a function, send all player movement through it
       at_left_right_limit = nil
       at_up_down_limit = nil
@@ -704,14 +618,17 @@ class ExGameEngine
           reflectedRayTipY = rayTipY - (dotNormalY * 2)
           @player_velocity[0] = (reflectedRayTipX * rfx) + ((rand - 0.5) * 0.001)
           @player_velocity[2] = (reflectedRayTipY * rfy) + ((rand - 0.5) * 0.001)
+          @player_velocity[0] = 0.5 * @player_velocity[0]
+          @player_velocity[2] = 0.5 * @player_velocity[2]
         else
           @player_position[0] = nx
           @player_position[2] = ny
         end
       end
+    ### SIMPLE COLLISION ###########################333
     end
-##################################3
 
+    ### MAZE LOADING ###
     need_new_maze = false
 
     if px != @cpx
@@ -731,40 +648,23 @@ class ExGameEngine
     @px = px
     @py = py
 
+    ### MULTIPLAYER ###
     @players.each { |key, rpv|
       player_position, player_velocity, xintended_forces = *rpv
-
-    #  #player_velocity[0] += (player_velocity[0] * -1.0) * friction
-    #  #player_velocity[2] += (player_velocity[2] * -1.0) * friction
-
-      #navx = (player_velocity[0] * delta_time)
-      #navy = (player_velocity[2] * delta_time)
 
       npx = player_position[0] + (player_velocity[0] * delta_time)
       npy = player_position[2] + (player_velocity[2] * delta_time)
 
-      player_velocity[0] += (xintended_forces[0] * delta_time) - (player_velocity[0] * (friction * 1.79) * delta_time)
-      player_velocity[2] += (xintended_forces[1] * delta_time) - (player_velocity[2] * (friction * 1.79) * delta_time)
-
-    #  nnx = player_position[0] + (player_velocity[0] * delta_time)
-    #  nny = player_position[2] + (player_velocity[2] * delta_time)
+      player_velocity[0] += ((xintended_forces[0] * 1.0) - (player_velocity[0] * (friction * 1.79))) * delta_time
+      player_velocity[2] += ((xintended_forces[1] * 1.0) - (player_velocity[2] * (friction * 1.79))) * delta_time
 
       player_position[0] = npx
       player_position[2] = npy
     }
 
-    #nx = @player_position[0] + (@player_velocity[0] * delta_time)
-    #ny = @player_position[2] + (@player_velocity[2] * delta_time)
-    ##DEBUG physics
-    #@player_position[0] = nx
-    #@player_position[2] = ny
-    ##DEBUG physics
-    #@player_velocity[0] += (intended_forces[0] * delta_time) - (@player_velocity[0] * friction * delta_time)
-    #@player_velocity[2] += (intended_forces[1] * delta_time) - (@player_velocity[2] * friction * delta_time)
-
     hop_timeout = 0.333
     @time_since_last_hop += delta_time
-    if bounced || @time_since_last_hop > hop_timeout || (had_pressed && @time_since_last_hop > (hop_timeout * 0.5))
+    if bounced || @time_since_last_hop > hop_timeout || ((had_pressed) && @time_since_last_hop > (hop_timeout * 0.5))
       @time_since_last_hop = 0
       gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity, intended_forces]}})
       @sent += 1
@@ -779,7 +679,6 @@ class ExGameEngine
     #@shapes.each { |i, shape|
     #  shape.reset
     #}
-
     #Simple draw bits
     #if @maze_level > 0
     #  if @maze && @px && @py
@@ -806,16 +705,16 @@ class ExGameEngine
     #end
 
         @anm.each { |b, anms|
-                    shape = @shapes[b]
-                    anms.each { |anm|
-                      if anm.state != :reset
-                        shape.deltar(0.0, 1.0, 0.0, 0.0)
-                        shape.deltap(*anm.output)
-                        shape.deltas(1.0, 1.0, 1.0)
-                        #shape.next
-                        shape.draw(false)
-                      end
-                    }
+          shape = @shapes[b]
+          anms.each { |anm|
+            if anm.state != :reset
+              shape.deltar(0.0, 1.0, 0.0, 0.0)
+              shape.deltap(*anm.output)
+              shape.deltas(1.0, 1.0, 1.0)
+              #shape.next
+              shape.draw(false)
+            end
+          }
         }
 
 
@@ -851,7 +750,7 @@ class ExGameEngine
 
     #@batcher.draw(@cube.current_shape)
 
-    ##TODO
+    ### MULTIPLAYER ###
     @players.each { |key, rpv|
       player_position, player_velocity = *rpv
       @cube.deltar(0.0, 1.0, 0.0, (Math.atan2(player_velocity[0], player_velocity[2]) * (180.0/3.14)) + 0.0)
@@ -868,7 +767,7 @@ class ExGameEngine
   end
 
   def game_status
-    #@maze_level.to_s + " | " + 
+    @maze_level.to_s + " | " + 
     #@ticks.to_s + " | " +
     ("%03.2f" % (1.0 / (@last_delta_time || 1.0))) + " | " +
     ("%04.1f" % (@last_global_time || 0.0))
@@ -920,7 +819,6 @@ Wkndr.nonce("chicken") {
       shapes[i] = m
     }
 
-    #Wkndr.log! [:GameEngineStart, store, shapes]
     ExGameEngine.start(gl, distance, chicken_model, shapes, @batcher, shape_batchers)
   }
 }
