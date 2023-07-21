@@ -19,7 +19,7 @@ spec:
       containers:
       - name: main
         #image: chicken-maze.run:latest
-        image: polly-registry:23443/polly-registry/chicken-maze.run:wkndr-a5ca6fe53247bd93edfa0da33d0cf178b56281f4
+        image: polly-registry:23443/polly-registry/chicken-maze.run:wkndr-9b7dbe783256d2970725ec6a11d03c0aadf29c94
         imagePullPolicy: IfNotPresent
         command: ["/var/lib/wkndr/release/wkndr.mruby.x11", "--server=/var/lib/wkndr/public", "--no-client"]
           #--server=/home/jon/workspace/chicken-maze.run/public --no-client
@@ -35,7 +35,7 @@ spec:
         volumeMounts: []
       - name: mkmaze
         #image: chicken-maze.run:latest
-        image: polly-registry:23443/polly-registry/chicken-maze.run:wkndr-a5ca6fe53247bd93edfa0da33d0cf178b56281f4
+        image: polly-registry:23443/polly-registry/chicken-maze.run:wkndr-9b7dbe783256d2970725ec6a11d03c0aadf29c94
         imagePullPolicy: IfNotPresent
         command: ["/var/lib/wkndr/release/wkndr.mruby.x11", "--no-server", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
         resources:
