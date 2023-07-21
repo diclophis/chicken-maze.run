@@ -18,9 +18,11 @@ spec:
       volumes: []
       containers:
       - name: main
-        image: chicken-maze.run:latest
+        #image: chicken-maze.run:latest
+        image: polly-registry:23443/polly-registry/chicken-maze.run:wkndr-a5ca6fe53247bd93edfa0da33d0cf178b56281f4
         imagePullPolicy: IfNotPresent
-        command: ["/var/lib/wkndr/release/wkndr.mruby", "--server=/var/lib/wkndr/public", "--client=-1x-1", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
+        command: ["/var/lib/wkndr/release/wkndr.mruby.x11", "--server=/var/lib/wkndr/public", "--no-client"]
+          #--server=/home/jon/workspace/chicken-maze.run/public --no-client
         ports:
         - containerPort: 8000
         resources:
@@ -31,18 +33,19 @@ spec:
             memory: 100M
             cpu: 10m
         volumeMounts: []
-      #- name: mkmaze
-      #  image: chicken-maze.run:latest
-      #  imagePullPolicy: IfNotPresent
-      #  command: ["/var/lib/wkndr/release/wkndr.mruby", "--no-server", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
-      #  resources:
-      #    limits:
-      #      memory: 1024M
-      #      cpu: 100m
-      #    requests:
-      #      memory: 100M
-      #      cpu: 100m
-      #  volumeMounts: []
+      - name: mkmaze
+        #image: chicken-maze.run:latest
+        image: polly-registry:23443/polly-registry/chicken-maze.run:wkndr-a5ca6fe53247bd93edfa0da33d0cf178b56281f4
+        imagePullPolicy: IfNotPresent
+        command: ["/var/lib/wkndr/release/wkndr.mruby.x11", "--no-server", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
+        resources:
+          limits:
+            memory: 1024M
+            cpu: 100m
+          requests:
+            memory: 100M
+            cpu: 100m
+        volumeMounts: []
       #- name: mkmaze
       #  image: chicken-maze.run:latest
       #  imagePullPolicy: IfNotPresent
@@ -63,27 +66,28 @@ kind: Service
 metadata:
   name: chicken-maze-service
 spec:
-  type: NodePort
   selector:
     app: chicken-maze
   ports:
   - protocol: TCP
     name: app
     port: 8000
-    nodePort: 32341
-
----
-apiVersion: extensions/v1beta1
+...
+--- 
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: chicken-maze-vhost
-  annotations:
-    ingress.class: wkndr
 spec:
   rules:
   - host: chicken-maze.run
     http:
       paths:
-      - backend:
-          serviceName: chicken-maze-service
-          servicePort: 8000
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: chicken-maze-service
+              port:
+                number: 8000
+...

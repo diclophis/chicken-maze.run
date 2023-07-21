@@ -261,7 +261,7 @@ class ExGameEngine
   end
 
   #(gl, distance, chic, shapes, @batche, shape_batchers)
-  def self.start(gl, distance, cube, shapes, batcher, shape_batchers, starting_level = 16, direction = :level_up)
+  def self.start(gl, distance, cube, shapes, batcher, shape_batchers, starting_level = 3, direction = :level_up)
     #Wkndr.log! [:prev, @start_game_proc]
 
     @start_game_proc ||= Proc.new { |maze_level, direction_inner|
