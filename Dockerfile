@@ -9,7 +9,7 @@ COPY Wkndrfile Wkndrfile.mkmaze /var/lib/wkndr/
 RUN ls -lh /var/lib/wkndr/resources
 
 #RUN /var/lib/wkndr/simple-bake.sh
-RUN cd /root/emsdk && . ./emsdk_env.sh && cd /var/lib/wkndr && emmake make release/wkndr.html
+RUN cd /root/emsdk && . ./emsdk_env.sh && cd /var/lib/wkndr && find release -name "*.o" -delete && find release -name "*.a" && emmake make release/wkndr.html
 
 RUN /var/lib/wkndr/simple-cp.sh
 
