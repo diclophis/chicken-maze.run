@@ -3435,7 +3435,7 @@ Wkndr.client_side("mkmaze") { |gl|
         out.each_with_index { |wwh, w|
           #Wkndr.log! [:wwh, maze_id, w, wwh, location]
           wwh.each_with_index { |whh, h|
-            if ((location[0] - w).abs < 2.5) && ((location[2] - h).abs < 2.5)
+            if ((location[0] - w).abs < 2.0) && ((location[2] - h).abs < 2.0)
               flatb[[w,h]] = whh
               #Wkndr.log! [:chunk_msg, [w, h], whh]
             end
