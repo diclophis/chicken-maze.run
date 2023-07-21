@@ -179,37 +179,35 @@ class ExGameEngine
 
     @player_velocity = [0.0, 0.0, 0.0]
 
-    #@top_left_min = [1.1, 1.1]
-    #@top_left_max = [0.1, 0.1]
-    #@top_right_min = [-0.1, 1.1]
-    #@top_right_max = [-1.1, 0.1]
-    #@bottom_left_min = [1.1, -0.1]
-    #@bottom_left_max = [0.1, -1.1]
-    #@bottom_right_min = [-0.1, -0.1]
-    #@bottom_right_max = [-1.1, -1.1]
-
-    #@no_left_min = [1.1, 0.1]
-    #@no_left_max = [0.1, -0.1]
-    #@no_right_min = [-0.1, 0.1]
-    #@no_right_max = [-1.1, -0.1]
-    #@no_up_min = [0.1, 1.1]
-    #@no_up_max = [-0.1, 0.1]
-    #@no_down_min = [0.1, -0.1]
-    #@no_down_max = [-0.1, -1.1]
-
+    # COLLISION detection
+    @top_left_min = [1.1, 1.1]
+    @top_left_max = [0.1, 0.1]
+    @top_right_min = [-0.1, 1.1]
+    @top_right_max = [-1.1, 0.1]
+    @bottom_left_min = [1.1, -0.1]
+    @bottom_left_max = [0.1, -1.1]
+    @bottom_right_min = [-0.1, -0.1]
+    @bottom_right_max = [-1.1, -1.1]
+    ############fooo
+    @no_left_min = [1.1, 0.1]
+    @no_left_max = [0.1, -0.1]
+    @no_right_min = [-0.1, 0.1]
+    @no_right_max = [-1.1, -0.1]
+    @no_up_min = [0.1, 1.1]
+    @no_up_max = [-0.1, 0.1]
+    @no_down_min = [0.1, -0.1]
+    @no_down_max = [-0.1, -1.1]
     ## left to right
-    #@lne_x1 = 0.0
-    #@lne_y1 = -1.0
-
-    #@lne_x2 = 0.0
-    #@lne_y2 = 1.0
-
-    ## up to down
-    #@lin_x1 = -1.0
-    #@lin_y1 = 0.0
-
-    #@lin_x2 = 1.0
-    #@lin_y2 = 0.0
+    @lne_x1 = 0.0
+    @lne_y1 = -1.0
+    @lne_x2 = 0.0
+    @lne_y2 = 1.0
+    # up to down
+    @lin_x1 = -1.0
+    @lin_y1 = 0.0
+    @lin_x2 = 1.0
+    @lin_y2 = 0.0
+    # COLLISION detection
 
     @maze_draw_distance = distance
 
@@ -450,18 +448,6 @@ class ExGameEngine
     end
   end
 
-=begin
-    player_at_shape = 0
-
-    if @maze
-      if px >= 0 && px < @maze_s && py >= 0 && py < @maze_s
-        if @maze[px.to_i] && @maze[px.to_i][py.to_i]
-          player_at_shape = (@maze[px.to_i][py.to_i] & PRIMARY)
-        end
-      end
-    end
-=end
-
   def update(gl, global_time, delta_time)
     #mx, my, l = nil
     #gl.mousep { |xyl|
@@ -480,14 +466,8 @@ class ExGameEngine
 
     #px = py = nx = ny = 0
     #got_lr = got_ud = false
-    #player_at_shape = nil
-    #at_left_right_limit = nil
-    #at_up_down_limit = nil
-    #allow_up = false
-    #allow_down = false
-    #allow_left = false
-    #allow_right = false
-    #bounced = false
+
+
     #no_bounce_reset = 0
 
     #allow_up = false
@@ -501,8 +481,8 @@ class ExGameEngine
 
     #max_v = 20.333
     
-    #rfx = 0.999
-    #rfy = 0.999
+    rfx = 0.999
+    rfy = 0.999
 
     this_direction = speed
 
@@ -526,84 +506,6 @@ class ExGameEngine
           intended_forces[0] = -this_direction
       end
     end
-
-    #case player_at_shape
-    #  when 15 # 0
-    #    allow_up = allow_down = allow_left = allow_right = true
-    #  when 13
-    #    allow_down = allow_left = allow_right = true
-    #  when 14
-    #    allow_up = allow_left = allow_right = true
-    #  when 7
-    #    allow_up = allow_down = allow_left = true
-    #  when 11
-    #    allow_up = allow_down = allow_right = true
-    #  when 8
-    #    allow_right = true
-    #  when 4
-    #    allow_left = true
-    #  when 2
-    #    allow_up = true
-    #  when 1
-    #    allow_down = true
-    #  when 3
-    #    allow_down = allow_up = true
-    #    #TODO
-    #    #includes left right crossing bits
-    #    #TODO
-    #  when 12 # IS REALLY left-right from maze
-    #    allow_left = allow_right = true
-    #  when 6
-    #    allow_up = allow_left = true
-    #  when 5
-    #    allow_down = allow_left = true
-    #  when 9
-    #    allow_down = allow_right = true
-    #  when 10
-    #    allow_up = allow_right = true
-    #end
-
-    #at_left_right_limit = ((nx - px))
-    #at_up_down_limit = ((ny - py))
-
-    #@player_min[0] = at_left_right_limit + 0.05
-    #@player_min[1] = at_up_down_limit + 0.05
-    #@player_max[0] = at_left_right_limit - 0.05
-    #@player_max[1] = at_up_down_limit - 0.05
-
-    #bounced = false
-
-    #if ab = AABB.test(@top_left_min, @top_left_max, @player_min, @player_max)
-    #  bounced = ab
-    #end
-
-    #if ab = AABB.test(@bottom_left_min, @bottom_left_max, @player_min, @player_max)
-    #  bounced = ab
-    #end
-
-    #if ab = AABB.test(@bottom_right_min, @bottom_right_max, @player_min, @player_max)
-    #  bounced = ab
-    #end
-
-    #if ab = AABB.test(@top_right_min, @top_right_max, @player_min, @player_max)
-    #  bounced = ab
-    #end
-
-    #if !allow_left && ab = AABB.test(@no_left_min, @no_left_max, @player_min, @player_max)
-    #  bounced = ab
-    #end
-
-    #if !allow_right && ab = AABB.test(@no_right_min, @no_right_max, @player_min, @player_max)
-    #  bounced = ab
-    #end
-
-    #if !allow_up && ab = AABB.test(@no_up_min, @no_up_max, @player_min, @player_max)
-    #  bounced = ab
-    #end
-
-    #if !allow_down && ab = AABB.test(@no_down_min, @no_down_max, @player_min, @player_max)
-    #  bounced = ab
-    #end
 
 
     #if @maze_level > 0
@@ -663,11 +565,6 @@ class ExGameEngine
     nx = @player_position[0] + (@player_velocity[0] * delta_time)
     ny = @player_position[2] + (@player_velocity[2] * delta_time)
 
-    #DEBUG physics
-    @player_position[0] = nx
-    @player_position[2] = ny
-    #DEBUG physics
-
     @player_velocity[0] += (intended_forces[0] * delta_time) - (@player_velocity[0] * friction * delta_time)
     @player_velocity[2] += (intended_forces[1] * delta_time) - (@player_velocity[2] * friction * delta_time)
 
@@ -675,6 +572,145 @@ class ExGameEngine
     py = @player_position[2].round
 
     maze_current = [px, py]
+
+    if false
+      #DEBUG physics
+      @player_position[0] = nx
+      @player_position[2] = ny
+      #DEBUG physics
+    else
+      #TODO: make this a function, send all player movement through it
+      at_left_right_limit = nil
+      at_up_down_limit = nil
+      allow_up = false
+      allow_down = false
+      allow_left = false
+      allow_right = false
+      bounced = false
+      player_at_shape = false
+  
+      if @maze
+        if px >= 0 && px < @maze_s && py >= 0 && py < @maze_s
+          if @maze[px.to_i] && @maze[px.to_i][py.to_i]
+            player_at_shape = (@maze[px.to_i][py.to_i] & PRIMARY)
+          end
+        end
+      end
+
+      case player_at_shape
+        when 15 # 0
+          allow_up = allow_down = allow_left = allow_right = true
+        when 13
+          allow_down = allow_left = allow_right = true
+        when 14
+          allow_up = allow_left = allow_right = true
+        when 7
+          allow_up = allow_down = allow_left = true
+        when 11
+          allow_up = allow_down = allow_right = true
+        when 8
+          allow_right = true
+        when 4
+          allow_left = true
+        when 2
+          allow_up = true
+        when 1
+          allow_down = true
+        when 3
+          allow_down = allow_up = true
+          #TODO
+          #includes left right crossing bits
+          #TODO
+        when 12 # IS REALLY left-right from maze
+          allow_left = allow_right = true
+        when 6
+          allow_up = allow_left = true
+        when 5
+          allow_down = allow_left = true
+        when 9
+          allow_down = allow_right = true
+        when 10
+          allow_up = allow_right = true
+      end
+
+      at_left_right_limit = ((nx - px))
+      at_up_down_limit = ((ny - py))
+
+      @player_min[0] = at_left_right_limit + 0.05
+      @player_min[1] = at_up_down_limit + 0.05
+      @player_max[0] = at_left_right_limit - 0.05
+      @player_max[1] = at_up_down_limit - 0.05
+
+      bounced = false
+
+      if ab = AABB.test(@top_left_min, @top_left_max, @player_min, @player_max)
+        bounced = ab
+      end
+
+      if ab = AABB.test(@bottom_left_min, @bottom_left_max, @player_min, @player_max)
+        bounced = ab
+      end
+
+      if ab = AABB.test(@bottom_right_min, @bottom_right_max, @player_min, @player_max)
+        bounced = ab
+      end
+
+      if ab = AABB.test(@top_right_min, @top_right_max, @player_min, @player_max)
+        bounced = ab
+      end
+
+      if !allow_left && ab = AABB.test(@no_left_min, @no_left_max, @player_min, @player_max)
+        bounced = ab
+      end
+
+      if !allow_right && ab = AABB.test(@no_right_min, @no_right_max, @player_min, @player_max)
+        bounced = ab
+      end
+
+      if !allow_up && ab = AABB.test(@no_up_min, @no_up_max, @player_min, @player_max)
+        bounced = ab
+      end
+
+      if !allow_down && ab = AABB.test(@no_down_min, @no_down_max, @player_min, @player_max)
+        bounced = ab
+      end
+
+      if !player_at_shape 
+        @player_velocity[0] = -@player_velocity[0]
+        @player_velocity[2] = -@player_velocity[2]
+        @player_position[0] += @player_velocity[0] * delta_time
+        @player_position[2] += @player_velocity[2] * delta_time
+      else
+        if bounced
+          if bounced == :y
+            line_x1, line_y1, line_x2, line_y2 = @lne_x1, @lne_y1, @lne_x2, @lne_y2
+          end
+          if bounced == :x
+            line_x1, line_y1, line_x2, line_y2 = @lin_x1, @lin_y1, @lin_x2, @lin_y2
+          end
+          normalY = line_x2 - line_x1
+          normalX = line_y1 - line_y2
+          normalLength = Math.sqrt(normalX * normalX + normalY * normalY)
+          normalX = normalX / normalLength
+          normalY = normalY / normalLength
+          rayTipX = @player_velocity[0]
+          rayTipY = @player_velocity[2]
+          rayX = rayTipX
+          rayY = rayTipY 
+          dotProduct = (rayX * normalX) + (rayY * normalY)
+          dotNormalX = dotProduct * normalX
+          dotNormalY = dotProduct * normalY
+          reflectedRayTipX = rayTipX - (dotNormalX * 2)
+          reflectedRayTipY = rayTipY - (dotNormalY * 2)
+          @player_velocity[0] = (reflectedRayTipX * rfx) + ((rand - 0.5) * 0.001)
+          @player_velocity[2] = (reflectedRayTipY * rfy) + ((rand - 0.5) * 0.001)
+        else
+          @player_position[0] = nx
+          @player_position[2] = ny
+        end
+      end
+    end
+##################################3
 
     need_new_maze = false
 
@@ -728,7 +764,7 @@ class ExGameEngine
 
     hop_timeout = 0.333
     @time_since_last_hop += delta_time
-    if @time_since_last_hop > hop_timeout || (had_pressed && @time_since_last_hop > (hop_timeout * 0.5))
+    if bounced || @time_since_last_hop > hop_timeout || (had_pressed && @time_since_last_hop > (hop_timeout * 0.5))
       @time_since_last_hop = 0
       gl.emit({"position" => {$HEX => [@maze_level, @player_position, @player_velocity, intended_forces]}})
       @sent += 1
