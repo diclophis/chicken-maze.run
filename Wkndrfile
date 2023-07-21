@@ -271,7 +271,8 @@ class ExGameEngine
         @camera = GameCamera.new(2.0, 1.3)
         @game = self.new(distance, maze_level, cube, shapes, batcher, shape_batchers, direction_inner)
 
-        gl.emit({"maze_for_location" => {"maze_id" => @game.level, "location" => @game.player_position}})
+        #Wkndr.log! ["maze_for_lcoation", $HEX]
+        gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => @game.level, "location" => @game.player_position}})
       rescue => wtf
         Wkndr.log! [:wtf, wtf]
       end
@@ -297,6 +298,8 @@ class ExGameEngine
         when "position"
           @game.track_other_players!(msg)
         when "chunk_msg"
+          #Wkndr.log! [:chu, msg]
+
           @game.load_maze!(*msg)
 
       end
@@ -307,11 +310,15 @@ class ExGameEngine
     @maze_level
   end
 
-  def load_maze!(l, s, e, flatb)
+  def load_maze!(hex, l, s, e, flatb)
     @ach ||= {}
     @cch ||= {}
 
     @last_xyz ||= []
+
+    #Wkndr.log! [:load_mz, hex, $HEX]
+
+    return if hex != $HEX
 
     if @maze_level == l
       @maze_s = s
@@ -396,9 +403,10 @@ class ExGameEngine
         end
       }
 
-      #if @start_at_exit
-      #  @player_position = [@maze_exit[0] - 0.60,@floor_position-0.025, @maze_exit[1]]
-      #end
+      if @start_at_exit
+        @start_at_exit = false
+        @player_position = [@maze_exit[0] - 0.60,@floor_position-0.025, @maze_exit[1]]
+      end
     end
   end
 
@@ -459,22 +467,6 @@ class ExGameEngine
       end
     end
 
-    #if @maze_level > 0
-    ##NOTE: maze exit code
-    #  if @maze_exit == maze_current
-    #    @at_exit_time += delta_time
-    #    if @at_exit_time > 0.0
-    #      return :level_up
-    #    end
-    #  elsif @maze_entrance == maze_current
-    #    @at_exit_time += delta_time
-    #    if @at_exit_time > 0.0
-    #      return :level_down
-    #    end
-    #  else
-    #    @at_exit_time = 0.0
-    #  end
-
     nx = @player_position[0] + (@player_velocity[0] * delta_time)
     ny = @player_position[2] + (@player_velocity[2] * delta_time)
 
@@ -485,6 +477,23 @@ class ExGameEngine
     py = @player_position[2].round
 
     maze_current = [px, py]
+
+    ##NOTE: maze exit code
+    if @maze_level > 0
+      if @maze_exit == maze_current
+        @at_exit_time += delta_time
+        if @at_exit_time > 0.0
+          return :level_up
+        end
+      elsif @maze_entrance == maze_current
+        @at_exit_time += delta_time
+        if @at_exit_time > 0.0
+          return :level_down
+        end
+      else
+        @at_exit_time = 0.0
+      end
+    end
 
     if false
       #DEBUG physics
@@ -642,7 +651,7 @@ class ExGameEngine
     end
 
     if need_new_maze
-      gl.emit({"maze_for_location" => {"maze_id" => self.level, "location" => @player_position}})
+      gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => self.level, "location" => @player_position}})
     end
 
     @px = px

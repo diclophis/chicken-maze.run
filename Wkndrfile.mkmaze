@@ -3423,8 +3423,13 @@ Wkndr.client_side("mkmaze") { |gl|
         make_maze(maze_id)
 
       when "maze_for_location"
+
         location = msg["location"]
         maze_id = msg["maze_id"]
+        hex = msg["hex"]
+
+        #Wkndr.log! [:wtf, hex, msg]
+
         maze = make_maze(maze_id)
 
         maze_id_msg, maze_size, exit_pos, out = *maze
@@ -3442,7 +3447,8 @@ Wkndr.client_side("mkmaze") { |gl|
           }
         }
 
-        chunk_msg = [maze_id, maze_size, exit_pos, flatb]
+        chunk_msg = [hex, maze_id, maze_size, exit_pos, flatb]
+        #Wkndr.log! [:out, chunk_msg]
         gl.emit({"chunk_msg" => chunk_msg})
 
     end
