@@ -137,6 +137,7 @@ class ExGameEngine
   end
 
   def initialize(distance, maze_level, cube, shapes, batcher, shape_batchers, direction)
+    @distance = distance
     #if maze_level < 1
     #  raise
     ##  maze_level = 10
@@ -222,9 +223,9 @@ class ExGameEngine
     @anm = {}
     @shapes.each { |k,v|
       @anm[k] = []
-      0.times {
-        @anm[k] << ArmatureAnimation.new
-      }
+      #0.times {
+      #  @anm[k] << ArmatureAnimation.new
+      #}
     }
   end
 
@@ -237,7 +238,7 @@ class ExGameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
-    @camera.update(gl, global_time, delta_time, 3.0, 7.0, @game.player_position)
+    @camera.update(gl, global_time, delta_time, 2.0, 5.0, @game.player_position)
 
     case @game.update(gl, global_time, delta_time)
       when :level_up
@@ -272,7 +273,7 @@ class ExGameEngine
         @game = self.new(distance, maze_level, cube, shapes, batcher, shape_batchers, direction_inner)
 
         #Wkndr.log! ["maze_for_lcoation", $HEX]
-        gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => @game.level, "location" => @game.player_position}})
+        gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => @game.level, "location" => @game.player_position, "distance" => distance}})
       rescue => wtf
         Wkndr.log! [:wtf, wtf]
       end
@@ -316,7 +317,7 @@ class ExGameEngine
 
     @last_xyz ||= []
 
-    #Wkndr.log! [:load_mz, hex, $HEX]
+    Wkndr.log! [:load_mz, hex, $HEX]
 
     return if hex != $HEX
 
@@ -651,7 +652,7 @@ class ExGameEngine
     end
 
     if need_new_maze
-      gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => self.level, "location" => @player_position}})
+      gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => self.level, "location" => @player_position, "distance" => @distance}})
     end
 
     @px = px
@@ -804,7 +805,7 @@ Wkndr.nonce("chicken") {
   Wkndr.client_side("chicken") { |gl|
     gl.open_default_view!
 
-    distance = 1
+    distance = 4
     a = (((distance) * 2) + 1)
     b = a * a
 
