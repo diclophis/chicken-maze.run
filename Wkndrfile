@@ -137,6 +137,7 @@ class ExGameEngine
   end
 
   def initialize(distance, maze_level, cube, shapes, batcher, shape_batchers, direction)
+    @distance = distance
     #if maze_level < 1
     #  raise
     ##  maze_level = 10
@@ -222,9 +223,9 @@ class ExGameEngine
     @anm = {}
     @shapes.each { |k,v|
       @anm[k] = []
-      0.times {
-        @anm[k] << ArmatureAnimation.new
-      }
+      #0.times {
+      #  @anm[k] << ArmatureAnimation.new
+      #}
     }
   end
 
@@ -237,7 +238,7 @@ class ExGameEngine
   end
 
   def self.process_time(gl, global_time, delta_time)
-    @camera.update(gl, global_time, delta_time, 3.0, 7.0, @game.player_position)
+    @camera.update(gl, global_time, delta_time, 2.0, 5.0, @game.player_position)
 
     case @game.update(gl, global_time, delta_time)
       when :level_up
@@ -245,10 +246,13 @@ class ExGameEngine
       when :level_down
         @start_game_proc.call(@game.level - 1, :level_down)
     end
+
+    @camera.target_fov = [[(@camera.target_fov || 40.0) + (@game.player_speed * 13.0 * delta_time) - (5.0 * delta_time), 40.0].max, 90.0].min
   end
 
   def self.draw_threed(gl)
-    @camera.lookat(gl, @game.player_position, 42.0)
+    @camera.lookat(gl, @game.player_position, @camera.target_fov || 40.0)
+
     #(@game.level > 3) ? 100.0 : (@game.level * 20.0))
     #@camera.lookat(gl, @game.player_position, 100.9)
     #(@game.level > 3) ? 190.0 : (@game.level * 20.0))
@@ -272,7 +276,7 @@ class ExGameEngine
         @game = self.new(distance, maze_level, cube, shapes, batcher, shape_batchers, direction_inner)
 
         #Wkndr.log! ["maze_for_lcoation", $HEX]
-        gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => @game.level, "location" => @game.player_position}})
+        gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => @game.level, "location" => @game.player_position, "distance" => distance}})
       rescue => wtf
         Wkndr.log! [:wtf, wtf]
       end
@@ -438,8 +442,8 @@ class ExGameEngine
     #allow_right = false
 
     arrow_keys = gl.keyspressed(KEY_W, KEY_A, KEY_S, KEY_D, KEY_UP, KEY_DOWN)
-    speed = 9.357
-    friction = 3.597
+    speed = 9.711 #10.357
+    friction = 4.7911 #3.597
 
     rfx = 0.999
     rfy = 0.999
@@ -625,10 +629,14 @@ class ExGameEngine
           dotNormalY = dotProduct * normalY
           reflectedRayTipX = rayTipX - (dotNormalX * 2)
           reflectedRayTipY = rayTipY - (dotNormalY * 2)
-          @player_velocity[0] = (reflectedRayTipX * rfx) + ((rand - 0.5) * 0.001)
-          @player_velocity[2] = (reflectedRayTipY * rfy) + ((rand - 0.5) * 0.001)
-          @player_velocity[0] = 0.5 * @player_velocity[0]
-          @player_velocity[2] = 0.5 * @player_velocity[2]
+          @player_velocity[0] = ((reflectedRayTipX * rfx) + (0.0))
+          @player_velocity[2] = ((reflectedRayTipY * rfy) + (0.0))
+
+          @player_velocity[0] = 0.799 * @player_velocity[0] + (((Math.rand * 0.33)) * -dotNormalX)
+          @player_velocity[2] = 0.799 * @player_velocity[2] + (((Math.rand * 0.33)) * -dotNormalY)
+
+          #@player_velocity[0] = 0.499 * @player_velocity[0] + (((Math.rand * 0.33)) * -dotNormalX)
+          #@player_velocity[2] = 0.499 * @player_velocity[2] + (((Math.rand * 0.33)) * -dotNormalY)
         else
           @player_position[0] = nx
           @player_position[2] = ny
@@ -651,7 +659,7 @@ class ExGameEngine
     end
 
     if need_new_maze
-      gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => self.level, "location" => @player_position}})
+      gl.emit({"maze_for_location" => {"hex" => $HEX, "maze_id" => self.level, "location" => @player_position, "distance" => @distance}})
     end
 
     @px = px
@@ -804,7 +812,7 @@ Wkndr.nonce("chicken") {
   Wkndr.client_side("chicken") { |gl|
     gl.open_default_view!
 
-    distance = 1
+    distance = 4
     a = (((distance) * 2) + 1)
     b = a * a
 
