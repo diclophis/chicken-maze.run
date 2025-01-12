@@ -18,9 +18,9 @@ spec:
       volumes: []
       containers:
       - name: main
-        #image: chicken-maze.run:latest
-        image: polly-registry:23443/polly-registry/chicken-maze.run:wkndr-79605cc6325318db8303c42cfa58c850e909f0da
-        imagePullPolicy: IfNotPresent
+        image: chicken-maze.run:latest
+        #image: polly-registry:23443/polly-registry/chicken-maze.run:master-26106f28663a2123fc0e26850c2dfa805e4786d4
+        imagePullPolicy: Always
         command: ["/var/lib/wkndr/release/wkndr.mruby.x11", "--server=/var/lib/wkndr/public", "--no-client"]
           #--server=/home/jon/workspace/chicken-maze.run/public --no-client
         ports:
@@ -28,23 +28,23 @@ spec:
         resources:
           limits:
             memory: 1024M
-            cpu: 50m
+            cpu: 1000m
           requests:
             memory: 100M
             cpu: 10m
         volumeMounts: []
       - name: mkmaze
-        #image: chicken-maze.run:latest
-        image: polly-registry:23443/polly-registry/chicken-maze.run:wkndr-79605cc6325318db8303c42cfa58c850e909f0da
-        imagePullPolicy: IfNotPresent
+        image: chicken-maze.run:latest
+        #image: polly-registry:23443/polly-registry/chicken-maze.run:master-26106f28663a2123fc0e26850c2dfa805e4786d4
+        imagePullPolicy: Always
         command: ["/var/lib/wkndr/release/wkndr.mruby.x11", "--no-server", "--party=/var/lib/wkndr/Wkndrfile.mkmaze"]
         resources:
           limits:
             memory: 1024M
-            cpu: 100m
+            cpu: 1000m
           requests:
             memory: 100M
-            cpu: 100m
+            cpu: 10m
         volumeMounts: []
       #- name: mkmaze
       #  image: chicken-maze.run:latest
