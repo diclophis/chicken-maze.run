@@ -681,8 +681,8 @@ class ExGameEngine
           dotNormalY = dotProduct * normalY
           reflectedRayTipX = rayTipX - (dotNormalX * 2)
           reflectedRayTipY = rayTipY - (dotNormalY * 2)
-          @player_velocity[0] = ((reflectedRayTipX * rfx) + (0.0))
-          @player_velocity[2] = ((reflectedRayTipY * rfy) + (0.0))
+          @player_velocity[0] = ((reflectedRayTipX * rfx) + (0.0001))
+          @player_velocity[2] = ((reflectedRayTipY * rfy) + (0.0001))
 
           @player_velocity[0] = 0.799 * @player_velocity[0] + (((Math.rand * 0.33)) * -dotNormalX)
           @player_velocity[2] = 0.799 * @player_velocity[2] + (((Math.rand * 0.33)) * -dotNormalY)
@@ -871,7 +871,8 @@ Wkndr.nonce("chicken") {
   Wkndr.client_side("chicken") { |gl|
     gl.open_default_view!
 
-    distance = 2.5
+    distance = 5
+
     a = (((distance) * 2) + 1)
     b = (a * a) #(a * a) / 4
 
