@@ -3453,6 +3453,9 @@ Wkndr.client_side("mkmaze") { |gl|
         gl.emit({"chunk_msg" => chunk_msg})
 
     end
+
+    nil
   }
+
   Wkndr.log! [:mkmaze_client_init_done]
 }
