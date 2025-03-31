@@ -1,4 +1,4 @@
-FROM polly-registry:23443/polly-registry/wkndr:80b17e46e97d8395961a2a5d9216d946bc04aad8 AS wkndr
+FROM polly-registry:23443/polly-registry/wkndr:53865d681ca8c790232913b5a869fac7398d9e70 AS wkndr
 
 #RUN /var/lib/wkndr/iterate-web.sh
 
